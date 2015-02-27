@@ -6,21 +6,27 @@ import static org.junit.Assert.assertThat;
 import java.io.File;
 import java.util.HashMap;
 
+import org.arquillian.jruby.api.RubyResource;
 import org.asciidoctor.Asciidoctor;
 import org.asciidoctor.internal.JRubyAsciidoctor;
 import org.asciidoctor.util.ClasspathResources;
+import org.jboss.arquillian.junit.Arquillian;
+import org.jruby.Ruby;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
+@RunWith(Arquillian.class)
 public class WhenReaderIsManipulatedInExtension {
 
     @Rule
     public ClasspathResources classpath = new ClasspathResources();
 
-	private Asciidoctor asciidoctor = JRubyAsciidoctor.create();
-
 	@Test
-	public void currentLineNumberShouldBeReturned() {
+	public void currentLineNumberShouldBeReturned(@RubyResource Ruby rubyInstance) {
+
+        Asciidoctor asciidoctor = JRubyAsciidoctor.create(rubyInstance);
 
 		JavaExtensionRegistry javaExtensionRegistry = asciidoctor
 				.javaExtensionRegistry();
@@ -35,9 +41,11 @@ public class WhenReaderIsManipulatedInExtension {
 	}
 
 	@Test
-	public void hasMoreLinesShouldBeReturned() {
+	public void hasMoreLinesShouldBeReturned(@RubyResource Ruby rubyInstance) {
 
-		JavaExtensionRegistry javaExtensionRegistry = asciidoctor
+        Asciidoctor asciidoctor = JRubyAsciidoctor.create(rubyInstance);
+
+        JavaExtensionRegistry javaExtensionRegistry = asciidoctor
 				.javaExtensionRegistry();
 
 		javaExtensionRegistry.preprocessor(HasMoreLinesPreprocessor.class);
@@ -54,9 +62,11 @@ public class WhenReaderIsManipulatedInExtension {
 	}
 	
 	@Test
-	public void isNextLineEmptyShouldBeReturned() {
+	public void isNextLineEmptyShouldBeReturned(@RubyResource Ruby rubyInstance) {
 
-		JavaExtensionRegistry javaExtensionRegistry = asciidoctor
+        Asciidoctor asciidoctor = JRubyAsciidoctor.create(rubyInstance);
+
+        JavaExtensionRegistry javaExtensionRegistry = asciidoctor
 				.javaExtensionRegistry();
 
 		javaExtensionRegistry.preprocessor(NextLineEmptyPreprocessor.class);

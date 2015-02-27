@@ -11,15 +11,21 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.arquillian.jruby.api.RubyResource;
 import org.asciidoctor.ast.ContentPart;
 import org.asciidoctor.ast.DocumentHeader;
 import org.asciidoctor.ast.StructuredDocument;
 import org.asciidoctor.internal.JRubyAsciidoctor;
 import org.asciidoctor.util.ClasspathResources;
+import org.jboss.arquillian.junit.Arquillian;
+import org.jruby.Ruby;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+import org.junit.runner.RunWith;
 
+@RunWith(Arquillian.class)
 public class WhenStructuredDocumentIsRequired {
 
     @Rule
@@ -28,10 +34,9 @@ public class WhenStructuredDocumentIsRequired {
 	@Rule
 	public TemporaryFolder testFolder = new TemporaryFolder();
 
-	private Asciidoctor asciidoctor = JRubyAsciidoctor.create();
-
 	@Test
-	public void empty_parent_title_makes_subsection_be_null_when_is_parsed() {
+	public void empty_parent_title_makes_subsection_be_null_when_is_parsed(@RubyResource Ruby rubyInstance) {
+        Asciidoctor asciidoctor = JRubyAsciidoctor.create(rubyInstance);
 
 		String s = "= My page\n" + "\n" + "== Totally ignored header\n" + "\n"
 				+ "What does it mean?\n";
@@ -50,7 +55,8 @@ public class WhenStructuredDocumentIsRequired {
 	}
 
 	@Test
-	public void structural_content_should_be_retrieved_from_file() {
+	public void structural_content_should_be_retrieved_from_file(@RubyResource Ruby rubyInstance) {
+        Asciidoctor asciidoctor = JRubyAsciidoctor.create(rubyInstance);
 
 		Map<String, Object> parameters = new HashMap<String, Object>();
 		parameters.put(Asciidoctor.STRUCTURE_MAX_LEVEL, 2);
@@ -107,7 +113,9 @@ public class WhenStructuredDocumentIsRequired {
 	}
 
 	@Test
-	public void some_real_content() {
+	public void some_real_content(@RubyResource Ruby rubyInstance) {
+        Asciidoctor asciidoctor = JRubyAsciidoctor.create(rubyInstance);
+
 		StructuredDocument document = asciidoctor.readDocumentStructure(
 				classpath.getResource("contentstructure.asciidoc"),
 				new HashMap<String, Object>());
@@ -143,9 +151,10 @@ public class WhenStructuredDocumentIsRequired {
 	}
 
 	@Test
-	public void title_should_be_retrieved_from_simple_string() {
+	public void title_should_be_retrieved_from_simple_string(@RubyResource Ruby rubyInstance) {
+        Asciidoctor asciidoctor = JRubyAsciidoctor.create(rubyInstance);
 
-		StructuredDocument document = asciidoctor.readDocumentStructure(
+        StructuredDocument document = asciidoctor.readDocumentStructure(
 				"= Sample Document", new HashMap<String, Object>());
 
 		DocumentHeader header = document.getHeader();
@@ -160,7 +169,8 @@ public class WhenStructuredDocumentIsRequired {
 	}
 
 	@Test
-	public void one_part_should_be_retrieved_from_simple_string() {
+	public void one_part_should_be_retrieved_from_simple_string(@RubyResource Ruby rubyInstance) {
+        Asciidoctor asciidoctor = JRubyAsciidoctor.create(rubyInstance);
 
 		StructuredDocument document = asciidoctor.readDocumentStructure(
 				"Simple single paragraph", new HashMap<String, Object>());
@@ -178,7 +188,8 @@ public class WhenStructuredDocumentIsRequired {
 	}
 
 	@Test
-	public void no_parts_should_be_retrieved_from_empty_string() {
+	public void no_parts_should_be_retrieved_from_empty_string(@RubyResource Ruby rubyInstance) {
+        Asciidoctor asciidoctor = JRubyAsciidoctor.create(rubyInstance);
 
 		StructuredDocument document = asciidoctor.readDocumentStructure("",
 				new HashMap<String, Object>());

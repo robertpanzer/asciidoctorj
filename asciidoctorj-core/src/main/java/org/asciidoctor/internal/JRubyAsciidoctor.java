@@ -82,7 +82,30 @@ public class JRubyAsciidoctor implements Asciidoctor {
         return asciidoctor;
     }
 
+    public static Asciidoctor create(Ruby rubyInstance) {
+        Map<String, Object> env = new HashMap<String, Object>();
+        // ideally, we want to clear GEM_PATH by default, but for backwards compatibility we play nice
+        //env.put(GEM_PATH, null);
+        Asciidoctor asciidoctor = createJRubyAsciidoctorInstance(rubyInstance);
+        registerExtensions(asciidoctor);
+        registerConverters(asciidoctor);
+
+        return asciidoctor;
+    }
+
     public static Asciidoctor create(String gemPath) {
+        Map<String, Object> env = new HashMap<String, Object>();
+        // a null value will clear the GEM_PATH and GEM_HOME
+        env.put(GEM_PATH, gemPath);
+
+        Asciidoctor asciidoctor = createJRubyAsciidoctorInstance(env);
+        registerExtensions(asciidoctor);
+        registerConverters(asciidoctor);
+
+        return asciidoctor;
+    }
+
+    public static Asciidoctor create(String gemPath, Ruby rubyRuntime) {
         Map<String, Object> env = new HashMap<String, Object>();
         // a null value will clear the GEM_PATH and GEM_HOME
         env.put(GEM_PATH, gemPath);
@@ -145,6 +168,13 @@ public class JRubyAsciidoctor implements Asciidoctor {
         injectEnvironmentVariables(config, environmentVars);
 
         Ruby rubyRuntime = JavaEmbedUtils.initialize(Collections.EMPTY_LIST, config);
+
+        JRubyRuntimeContext.set(rubyRuntime);
+
+        return createJRubyAsciidoctorInstance(rubyRuntime);
+    }
+
+    private static Asciidoctor createJRubyAsciidoctorInstance(Ruby rubyRuntime) {
 
         JRubyRuntimeContext.set(rubyRuntime);
 

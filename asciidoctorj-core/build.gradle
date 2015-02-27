@@ -15,6 +15,7 @@ dependencies {
   testCompile "com.google.guava:guava:$guavaVersion"
   testCompile "org.jsoup:jsoup:$jsoupVersion"
   testCompile project(path: ':asciidoctorj-test-support', configuration: 'tests')
+  testCompile "org.jboss.arquillian.junit:arquillian-junit-container:$arquillianVersion"
 }
 
 def gemFiles = fileTree(jruby.gemInstallDir) {

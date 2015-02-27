@@ -16,6 +16,7 @@ import org.asciidoctor.converter.JavaConverterRegistry;
 import org.asciidoctor.extension.JavaExtensionRegistry;
 import org.asciidoctor.extension.RubyExtensionRegistry;
 import org.asciidoctor.internal.JRubyAsciidoctor;
+import org.jruby.Ruby;
 
 /**
  * 
@@ -666,6 +667,19 @@ public interface Asciidoctor {
          */
         public static Asciidoctor create() {
             return JRubyAsciidoctor.create();
+        }
+
+        /**
+         * Creates a new instance of Asciidoctor in the given Ruby runtime
+         *
+         * @param rubyRuntime
+         *            The prepared ruby runtime.
+         *
+         * @return Asciidoctor instance which uses JRuby to wraps Asciidoctor
+         *         Ruby calls.
+         */
+        public static Asciidoctor create(Ruby rubyRuntime) {
+            return JRubyAsciidoctor.create(rubyRuntime);
         }
 
         /**
