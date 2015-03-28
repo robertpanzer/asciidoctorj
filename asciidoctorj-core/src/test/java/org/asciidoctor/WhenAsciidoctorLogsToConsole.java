@@ -1,11 +1,8 @@
 package org.asciidoctor;
 
-import org.arquillian.jruby.api.RubyResource;
-import org.asciidoctor.internal.JRubyAsciidoctor;
 import org.asciidoctor.util.ClasspathResources;
 import org.jboss.arquillian.junit.Arquillian;
-import org.jruby.Ruby;
-import org.junit.Before;
+import org.jboss.arquillian.test.api.ArquillianResource;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -25,8 +22,7 @@ public class WhenAsciidoctorLogsToConsole {
     public TemporaryFolder testFolder = new TemporaryFolder();
 
     @Test
-    public void shouldBeRedirectToAsciidoctorJLoggerSystem(@RubyResource Ruby rubyInstance) {
-        Asciidoctor asciidoctor = JRubyAsciidoctor.create(rubyInstance);
+    public void shouldBeRedirectToAsciidoctorJLoggerSystem(@ArquillianResource Asciidoctor asciidoctor) {
         File inputFile = classpath.getResource("documentwithnotexistingfile.adoc");
         String renderContent = asciidoctor.renderFile(inputFile, options()
                 .inPlace(true).safe(SafeMode.SERVER).asMap());

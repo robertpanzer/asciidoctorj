@@ -1,25 +1,22 @@
 package org.asciidoctor;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
-import static org.junit.Assert.assertThat;
-
-import java.util.List;
-import java.util.Map;
-
-import org.arquillian.jruby.api.RubyResource;
 import org.asciidoctor.ast.Author;
 import org.asciidoctor.ast.DocumentHeader;
 import org.asciidoctor.ast.RevisionInfo;
-import org.asciidoctor.internal.JRubyAsciidoctor;
 import org.asciidoctor.util.ClasspathResources;
 import org.jboss.arquillian.junit.Arquillian;
-import org.jruby.Ruby;
-import org.junit.Before;
+import org.jboss.arquillian.test.api.ArquillianResource;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
+
+import java.util.List;
+import java.util.Map;
+
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
+import static org.junit.Assert.assertThat;
 
 @RunWith(Arquillian.class)
 public class WhenDocumentHeaderIsRequired {
@@ -31,9 +28,7 @@ public class WhenDocumentHeaderIsRequired {
     public TemporaryFolder testFolder = new TemporaryFolder();
 
 	@Test
-	public void doctitle_blocks_and_attributes_should_be_returned(@RubyResource Ruby rubyInstance) {
-        Asciidoctor asciidoctor = JRubyAsciidoctor.create(rubyInstance);
-
+	public void doctitle_blocks_and_attributes_should_be_returned(@ArquillianResource Asciidoctor asciidoctor) {
         DocumentHeader header = asciidoctor.readDocumentHeader(classpath.getResource("documentheaders.asciidoc"));
 
 
@@ -53,9 +48,7 @@ public class WhenDocumentHeaderIsRequired {
 	}
 	
 	@Test
-	public void author_info_should_be_bound_into_author_class(@RubyResource Ruby rubyInstance) {
-        Asciidoctor asciidoctor = JRubyAsciidoctor.create(rubyInstance);
-
+	public void author_info_should_be_bound_into_author_class(@ArquillianResource Asciidoctor asciidoctor) {
         DocumentHeader header = asciidoctor.readDocumentHeader(classpath.getResource("documentheaders.asciidoc"));
 		
 		Author author = header.getAuthor();
@@ -68,9 +61,7 @@ public class WhenDocumentHeaderIsRequired {
 	}
 	
 	@Test
-	public void revision_info_should_be_bound_into_revision_info_class(@RubyResource Ruby rubyInstance) {
-        Asciidoctor asciidoctor = JRubyAsciidoctor.create(rubyInstance);
-
+	public void revision_info_should_be_bound_into_revision_info_class(@ArquillianResource Asciidoctor asciidoctor) {
         DocumentHeader header = asciidoctor.readDocumentHeader(classpath.getResource("documentheaders.asciidoc"));
 		
 		RevisionInfo revisionInfo = header.getRevisionInfo();
@@ -83,9 +74,7 @@ public class WhenDocumentHeaderIsRequired {
 	
 	
 	@Test
-	public void multiple_authors_should_be_bound_into_list_of_authors(@RubyResource Ruby rubyInstance) {
-        Asciidoctor asciidoctor = JRubyAsciidoctor.create(rubyInstance);
-
+	public void multiple_authors_should_be_bound_into_list_of_authors(@ArquillianResource Asciidoctor asciidoctor) {
         DocumentHeader header = asciidoctor.readDocumentHeader(classpath.getResource("documentheaders.asciidoc"));
 		
 		List<Author> authors = header.getAuthors();

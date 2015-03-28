@@ -1,6 +1,7 @@
 dependencies {
   compile "org.jruby:jruby-complete:$jrubyVersion"
   compile "com.beust:jcommander:$jcommanderVersion"
+  compile project(':asciidoctorj-api')
   gems "rubygems:asciidoctor:$asciidoctorGemVersion"
   gems "rubygems:coderay:$coderayGemVersion"
   gems "rubygems:erubis:$erubisGemVersion"
@@ -15,7 +16,6 @@ dependencies {
   testCompile "com.google.guava:guava:$guavaVersion"
   testCompile "org.jsoup:jsoup:$jsoupVersion"
   testCompile project(path: ':asciidoctorj-test-support', configuration: 'tests')
-  testCompile "org.jboss.arquillian.junit:arquillian-junit-container:$arquillianVersion"
 }
 
 def gemFiles = fileTree(jruby.gemInstallDir) {

@@ -1,13 +1,21 @@
 package org.asciidoctor.extension;
 
-import static org.asciidoctor.OptionsBuilder.options;
-import static org.hamcrest.CoreMatchers.containsString;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.not;
-import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.hamcrest.CoreMatchers.startsWith;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
+import org.asciidoctor.Asciidoctor;
+import org.asciidoctor.Options;
+import org.asciidoctor.SafeMode;
+import org.asciidoctor.ast.DocumentRuby;
+import org.asciidoctor.util.ClasspathResources;
+import org.jboss.arquillian.junit.Arquillian;
+import org.jboss.arquillian.test.api.ArquillianResource;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
+import org.junit.Ignore;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
+import org.junit.runner.RunWith;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -17,30 +25,13 @@ import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.arquillian.jruby.api.RubyResource;
-import org.asciidoctor.Asciidoctor;
-import org.asciidoctor.Options;
-import org.asciidoctor.SafeMode;
-import org.asciidoctor.ast.DocumentRuby;
-import org.asciidoctor.internal.JRubyAsciidoctor;
-import org.asciidoctor.util.ClasspathResources;
-import org.jboss.arquillian.junit.Arquillian;
-import org.jruby.Ruby;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Ignore;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
-import org.junit.runner.RunWith;
+import static org.asciidoctor.OptionsBuilder.options;
+import static org.hamcrest.CoreMatchers.*;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
 
 @RunWith(Arquillian.class)
 public class WhenJavaExtensionIsRegistered {
@@ -97,9 +88,7 @@ public class WhenJavaExtensionIsRegistered {
     }
 
     @Test
-    public void an_inner_class_should_be_registered(@RubyResource Ruby rubyInstance) {
-
-        Asciidoctor asciidoctor = JRubyAsciidoctor.create(rubyInstance);
+    public void an_inner_class_should_be_registered(@ArquillianResource Asciidoctor asciidoctor) {
 
         JavaExtensionRegistry javaExtensionRegistry = asciidoctor.javaExtensionRegistry();
 
@@ -118,9 +107,7 @@ public class WhenJavaExtensionIsRegistered {
     }
 
     @Test
-    public void an_inner_anonymous_class_should_be_registered(@RubyResource Ruby rubyInstance) {
-
-        Asciidoctor asciidoctor = JRubyAsciidoctor.create(rubyInstance);
+    public void an_inner_anonymous_class_should_be_registered(@ArquillianResource Asciidoctor asciidoctor) {
 
         JavaExtensionRegistry javaExtensionRegistry = asciidoctor.javaExtensionRegistry();
 
@@ -177,8 +164,7 @@ public class WhenJavaExtensionIsRegistered {
     }
 
     @Test
-    public void a_docinfoprocessor_should_be_executed_and_add_meta_in_header_by_default(@RubyResource Ruby rubyInstance) {
-        Asciidoctor asciidoctor = JRubyAsciidoctor.create(rubyInstance);
+    public void a_docinfoprocessor_should_be_executed_and_add_meta_in_header_by_default(@ArquillianResource Asciidoctor asciidoctor) {
 
         JavaExtensionRegistry javaExtensionRegistry = asciidoctor.javaExtensionRegistry();
 
@@ -195,8 +181,7 @@ public class WhenJavaExtensionIsRegistered {
     }
 
     @Test
-    public void a_docinfoprocessor_should_be_executed_and_add_meta_in_footer(@RubyResource Ruby rubyInstance) {
-        Asciidoctor asciidoctor = JRubyAsciidoctor.create(rubyInstance);
+    public void a_docinfoprocessor_should_be_executed_and_add_meta_in_footer(@ArquillianResource Asciidoctor asciidoctor) {
 
         JavaExtensionRegistry javaExtensionRegistry = asciidoctor.javaExtensionRegistry();
 
@@ -218,9 +203,7 @@ public class WhenJavaExtensionIsRegistered {
     }
 
     @Test
-    public void a_preprocessor_should_be_executed_before_document_is_rendered(@RubyResource Ruby rubyInstance) {
-
-        Asciidoctor asciidoctor = JRubyAsciidoctor.create(rubyInstance);
+    public void a_preprocessor_should_be_executed_before_document_is_rendered(@ArquillianResource Asciidoctor asciidoctor) {
 
         JavaExtensionRegistry javaExtensionRegistry = asciidoctor.javaExtensionRegistry();
 
@@ -237,9 +220,7 @@ public class WhenJavaExtensionIsRegistered {
     }
 
     @Test
-    public void a_preprocessor_as_string_should_be_executed_before_document_is_rendered(@RubyResource Ruby rubyInstance) {
-
-        Asciidoctor asciidoctor = JRubyAsciidoctor.create(rubyInstance);
+    public void a_preprocessor_as_string_should_be_executed_before_document_is_rendered(@ArquillianResource Asciidoctor asciidoctor) {
 
         JavaExtensionRegistry javaExtensionRegistry = asciidoctor.javaExtensionRegistry();
 
@@ -256,9 +237,7 @@ public class WhenJavaExtensionIsRegistered {
     }
 
     @Test
-    public void a_preprocessor_instance_should_be_executed_before_document_is_rendered(@RubyResource Ruby rubyInstance) {
-
-        Asciidoctor asciidoctor = JRubyAsciidoctor.create(rubyInstance);
+    public void a_preprocessor_instance_should_be_executed_before_document_is_rendered(@ArquillianResource Asciidoctor asciidoctor) {
 
         JavaExtensionRegistry javaExtensionRegistry = asciidoctor.javaExtensionRegistry();
 
@@ -275,9 +254,7 @@ public class WhenJavaExtensionIsRegistered {
     }
 
     @Test
-    public void a_postprocessor_as_string_should_be_executed_after_document_is_rendered(@RubyResource Ruby rubyInstance) throws IOException {
-
-        Asciidoctor asciidoctor = JRubyAsciidoctor.create(rubyInstance);
+    public void a_postprocessor_as_string_should_be_executed_after_document_is_rendered(@ArquillianResource Asciidoctor asciidoctor) throws IOException {
 
         JavaExtensionRegistry javaExtensionRegistry = asciidoctor.javaExtensionRegistry();
 
@@ -296,9 +273,7 @@ public class WhenJavaExtensionIsRegistered {
     }
 
     @Test
-    public void a_postprocessor_should_be_executed_after_document_is_rendered(@RubyResource Ruby rubyInstance) throws IOException {
-
-        Asciidoctor asciidoctor = JRubyAsciidoctor.create(rubyInstance);
+    public void a_postprocessor_should_be_executed_after_document_is_rendered(@ArquillianResource Asciidoctor asciidoctor) throws IOException {
 
         JavaExtensionRegistry javaExtensionRegistry = asciidoctor.javaExtensionRegistry();
 
@@ -317,9 +292,7 @@ public class WhenJavaExtensionIsRegistered {
     }
 
     @Test
-    public void a_postprocessor_instance_should_be_executed_after_document_is_rendered(@RubyResource Ruby rubyInstance) throws IOException {
-
-        Asciidoctor asciidoctor = JRubyAsciidoctor.create(rubyInstance);
+    public void a_postprocessor_instance_should_be_executed_after_document_is_rendered(@ArquillianResource Asciidoctor asciidoctor) throws IOException {
 
         JavaExtensionRegistry javaExtensionRegistry = asciidoctor.javaExtensionRegistry();
 
@@ -338,9 +311,7 @@ public class WhenJavaExtensionIsRegistered {
     }
 
     @Test
-    public void a_include_processor_as_string_should_be_executed_when_include_macro_is_found(@RubyResource Ruby rubyInstance) {
-
-        Asciidoctor asciidoctor = JRubyAsciidoctor.create(rubyInstance);
+    public void a_include_processor_as_string_should_be_executed_when_include_macro_is_found(@ArquillianResource Asciidoctor asciidoctor) {
 
         JavaExtensionRegistry javaExtensionRegistry = asciidoctor.javaExtensionRegistry();
 
@@ -359,9 +330,7 @@ public class WhenJavaExtensionIsRegistered {
     }
 
     @Test
-    public void a_include_processor_should_be_executed_when_include_macro_is_found(@RubyResource Ruby rubyInstance) {
-
-        Asciidoctor asciidoctor = JRubyAsciidoctor.create(rubyInstance);
+    public void a_include_processor_should_be_executed_when_include_macro_is_found(@ArquillianResource Asciidoctor asciidoctor) {
 
         JavaExtensionRegistry javaExtensionRegistry = asciidoctor.javaExtensionRegistry();
 
@@ -380,9 +349,7 @@ public class WhenJavaExtensionIsRegistered {
     }
 
     @Test
-    public void a_include_instance_processor_should_be_executed_when_include_macro_is_found(@RubyResource Ruby rubyInstance) {
-
-        Asciidoctor asciidoctor = JRubyAsciidoctor.create(rubyInstance);
+    public void a_include_instance_processor_should_be_executed_when_include_macro_is_found(@ArquillianResource Asciidoctor asciidoctor) {
 
         JavaExtensionRegistry javaExtensionRegistry = asciidoctor.javaExtensionRegistry();
 
@@ -401,9 +368,7 @@ public class WhenJavaExtensionIsRegistered {
     }
 
     @Test
-    public void a_treeprocessor_should_be_executed_in_document(@RubyResource Ruby rubyInstance) {
-
-        Asciidoctor asciidoctor = JRubyAsciidoctor.create(rubyInstance);
+    public void a_treeprocessor_should_be_executed_in_document(@ArquillianResource Asciidoctor asciidoctor) {
 
         JavaExtensionRegistry javaExtensionRegistry = asciidoctor.javaExtensionRegistry();
 
@@ -424,9 +389,7 @@ public class WhenJavaExtensionIsRegistered {
     }
 
     @Test
-    public void a_treeprocessor_as_string_should_be_executed_in_document(@RubyResource Ruby rubyInstance) {
-
-        Asciidoctor asciidoctor = JRubyAsciidoctor.create(rubyInstance);
+    public void a_treeprocessor_as_string_should_be_executed_in_document(@ArquillianResource Asciidoctor asciidoctor) {
 
         JavaExtensionRegistry javaExtensionRegistry = asciidoctor.javaExtensionRegistry();
 
@@ -447,9 +410,7 @@ public class WhenJavaExtensionIsRegistered {
     }
 
     @Test
-    public void a_treeprocessor_instance_should_be_executed_in_document(@RubyResource Ruby rubyInstance) {
-
-        Asciidoctor asciidoctor = JRubyAsciidoctor.create(rubyInstance);
+    public void a_treeprocessor_instance_should_be_executed_in_document(@ArquillianResource Asciidoctor asciidoctor) {
 
         JavaExtensionRegistry javaExtensionRegistry = asciidoctor.javaExtensionRegistry();
 
@@ -471,9 +432,7 @@ public class WhenJavaExtensionIsRegistered {
 
     @Test
     @Ignore
-    public void extensions_should_be_correctly_added_using_extension_registry(@RubyResource Ruby rubyInstance) throws IOException {
-
-        Asciidoctor asciidoctor = JRubyAsciidoctor.create(rubyInstance);
+    public void extensions_should_be_correctly_added_using_extension_registry(@ArquillianResource Asciidoctor asciidoctor) throws IOException {
 
         // To avoid registering the same extension over and over for all tests,
         // service is instantiated manually.
@@ -499,9 +458,7 @@ public class WhenJavaExtensionIsRegistered {
     }
 
     @Test
-    public void a_block_macro_extension_should_be_executed_when_macro_is_detected(@RubyResource Ruby rubyInstance) {
-
-        Asciidoctor asciidoctor = JRubyAsciidoctor.create(rubyInstance);
+    public void a_block_macro_extension_should_be_executed_when_macro_is_detected(@ArquillianResource Asciidoctor asciidoctor) {
 
         JavaExtensionRegistry javaExtensionRegistry = asciidoctor.javaExtensionRegistry();
 
@@ -518,9 +475,7 @@ public class WhenJavaExtensionIsRegistered {
     }
 
     @Test
-    public void a_block_macro_extension_instance_should_be_executed_when_macro_is_detected(@RubyResource Ruby rubyInstance) {
-
-        Asciidoctor asciidoctor = JRubyAsciidoctor.create(rubyInstance);
+    public void a_block_macro_extension_instance_should_be_executed_when_macro_is_detected(@ArquillianResource Asciidoctor asciidoctor) {
 
         JavaExtensionRegistry javaExtensionRegistry = asciidoctor.javaExtensionRegistry();
 
@@ -537,9 +492,7 @@ public class WhenJavaExtensionIsRegistered {
     }
 
     @Test
-    public void a_block_macro_as_string_extension_should_be_executed_when_macro_is_detected(@RubyResource Ruby rubyInstance) {
-
-        Asciidoctor asciidoctor = JRubyAsciidoctor.create(rubyInstance);
+    public void a_block_macro_as_string_extension_should_be_executed_when_macro_is_detected(@ArquillianResource Asciidoctor asciidoctor) {
 
         JavaExtensionRegistry javaExtensionRegistry = asciidoctor.javaExtensionRegistry();
 
@@ -556,9 +509,7 @@ public class WhenJavaExtensionIsRegistered {
     }
 
     @Test
-    public void a_block_macro_as_instance_extension_should_be_executed_when_macro_is_detected(@RubyResource Ruby rubyInstance) {
-
-        Asciidoctor asciidoctor = JRubyAsciidoctor.create(rubyInstance);
+    public void a_block_macro_as_instance_extension_should_be_executed_when_macro_is_detected(@ArquillianResource Asciidoctor asciidoctor) {
 
         JavaExtensionRegistry javaExtensionRegistry = asciidoctor.javaExtensionRegistry();
 
@@ -578,9 +529,7 @@ public class WhenJavaExtensionIsRegistered {
     }
 
     @Test
-    public void an_inline_macro_as_string_extension_should_be_executed_when_an_inline_macro_is_detected(@RubyResource Ruby rubyInstance) {
-
-        Asciidoctor asciidoctor = JRubyAsciidoctor.create(rubyInstance);
+    public void an_inline_macro_as_string_extension_should_be_executed_when_an_inline_macro_is_detected(@ArquillianResource Asciidoctor asciidoctor) {
 
         JavaExtensionRegistry javaExtensionRegistry = asciidoctor.javaExtensionRegistry();
 
@@ -596,9 +545,7 @@ public class WhenJavaExtensionIsRegistered {
     }
 
     @Test
-    public void an_inline_macro_extension_should_be_executed_when_an_inline_macro_is_detected(@RubyResource Ruby rubyInstance) {
-
-        Asciidoctor asciidoctor = JRubyAsciidoctor.create(rubyInstance);
+    public void an_inline_macro_extension_should_be_executed_when_an_inline_macro_is_detected(@ArquillianResource Asciidoctor asciidoctor) {
 
         JavaExtensionRegistry javaExtensionRegistry = asciidoctor.javaExtensionRegistry();
 
@@ -615,9 +562,7 @@ public class WhenJavaExtensionIsRegistered {
     }
 
     @Test
-    public void an_inline_macro_as_instance_extension_should_be_executed_when_regexp_is_set_as_option_inline_macro_is_detected(@RubyResource Ruby rubyInstance) {
-
-        Asciidoctor asciidoctor = JRubyAsciidoctor.create(rubyInstance);
+    public void an_inline_macro_as_instance_extension_should_be_executed_when_regexp_is_set_as_option_inline_macro_is_detected(@ArquillianResource Asciidoctor asciidoctor) {
 
         JavaExtensionRegistry javaExtensionRegistry = asciidoctor.javaExtensionRegistry();
 
@@ -639,9 +584,7 @@ public class WhenJavaExtensionIsRegistered {
     }
 
     @Test
-    public void an_inline_macro_as_instance_extension_should_be_executed_when_an_inline_macro_is_detected(@RubyResource Ruby rubyInstance) {
-
-        Asciidoctor asciidoctor = JRubyAsciidoctor.create(rubyInstance);
+    public void an_inline_macro_as_instance_extension_should_be_executed_when_an_inline_macro_is_detected(@ArquillianResource Asciidoctor asciidoctor) {
 
         JavaExtensionRegistry javaExtensionRegistry = asciidoctor.javaExtensionRegistry();
 
@@ -662,9 +605,7 @@ public class WhenJavaExtensionIsRegistered {
     }
 
     @Test
-    public void should_unregister_all_current_registered_extensions(@RubyResource Ruby rubyInstance) throws IOException {
-
-        Asciidoctor asciidoctor = JRubyAsciidoctor.create(rubyInstance);
+    public void should_unregister_all_current_registered_extensions(@ArquillianResource Asciidoctor asciidoctor) throws IOException {
 
         JavaExtensionRegistry javaExtensionRegistry = asciidoctor.javaExtensionRegistry();
 
@@ -684,10 +625,8 @@ public class WhenJavaExtensionIsRegistered {
     }
 
     @Test
-    public void a_block_processor_as_string_should_be_executed_when_registered_block_is_found_in_document(@RubyResource Ruby rubyInstance)
+    public void a_block_processor_as_string_should_be_executed_when_registered_block_is_found_in_document(@ArquillianResource Asciidoctor asciidoctor)
             throws IOException {
-
-        Asciidoctor asciidoctor = JRubyAsciidoctor.create(rubyInstance);
 
         JavaExtensionRegistry javaExtensionRegistry = asciidoctor.javaExtensionRegistry();
 
@@ -704,9 +643,7 @@ public class WhenJavaExtensionIsRegistered {
     }
 
     @Test
-    public void a_block_processor_should_be_executed_when_registered_block_is_found_in_document(@RubyResource Ruby rubyInstance) throws IOException {
-
-        Asciidoctor asciidoctor = JRubyAsciidoctor.create(rubyInstance);
+    public void a_block_processor_should_be_executed_when_registered_block_is_found_in_document(@ArquillianResource Asciidoctor asciidoctor) throws IOException {
 
         JavaExtensionRegistry javaExtensionRegistry = asciidoctor.javaExtensionRegistry();
 
@@ -723,10 +660,8 @@ public class WhenJavaExtensionIsRegistered {
     }
 
     @Test
-    public void a_block_processor_instance_should_be_executed_when_registered_block_is_found_in_document(@RubyResource Ruby rubyInstance)
+    public void a_block_processor_instance_should_be_executed_when_registered_block_is_found_in_document(@ArquillianResource Asciidoctor asciidoctor)
             throws IOException {
-
-        Asciidoctor asciidoctor = JRubyAsciidoctor.create(rubyInstance);
 
         JavaExtensionRegistry javaExtensionRegistry = asciidoctor.javaExtensionRegistry();
 

@@ -13,9 +13,12 @@ import org.asciidoctor.ast.DocumentRuby;
 import org.asciidoctor.ast.StructuredDocument;
 import org.asciidoctor.ast.Title;
 import org.asciidoctor.converter.JavaConverterRegistry;
+import org.asciidoctor.converter.JavaConverterRegistryImpl;
 import org.asciidoctor.converter.internal.ConverterRegistryExecutor;
 import org.asciidoctor.extension.JavaExtensionRegistry;
+import org.asciidoctor.extension.JavaExtensionRegistryImpl;
 import org.asciidoctor.extension.RubyExtensionRegistry;
+import org.asciidoctor.extension.RubyExtensionRegistryImpl;
 import org.asciidoctor.extension.internal.ExtensionRegistryExecutor;
 import org.jruby.CompatVersion;
 import org.jruby.Ruby;
@@ -53,7 +56,6 @@ public class JRubyAsciidoctor implements Asciidoctor {
 
     }
 
-
     private static final Logger logger = Logger.getLogger(JRubyAsciidoctor.class.getName());
 
     private static final String GEM_PATH = "GEM_PATH";
@@ -69,6 +71,10 @@ public class JRubyAsciidoctor implements Asciidoctor {
         this.asciidoctorModule = asciidoctorModule;
         this.rubyRuntime = rubyRuntime;
         this.rubyGemsPreloader = new RubyGemsPreloader(this.rubyRuntime);
+    }
+
+    public JRubyAsciidoctor() {
+        super();
     }
 
     public static Asciidoctor create() {
@@ -537,17 +543,17 @@ public class JRubyAsciidoctor implements Asciidoctor {
 
     @Override
     public JavaExtensionRegistry javaExtensionRegistry() {
-        return new JavaExtensionRegistry(asciidoctorModule, rubyRuntime);
+        return new JavaExtensionRegistryImpl(asciidoctorModule, rubyRuntime);
     }
 
     @Override
     public RubyExtensionRegistry rubyExtensionRegistry() {
-        return new RubyExtensionRegistry(asciidoctorModule, rubyRuntime);
+        return new RubyExtensionRegistryImpl(asciidoctorModule, rubyRuntime);
     }
 
     @Override
     public JavaConverterRegistry javaConverterRegistry() {
-        return new JavaConverterRegistry(asciidoctorModule, rubyRuntime);
+        return new JavaConverterRegistryImpl(asciidoctorModule, rubyRuntime);
     }
 
     @Override

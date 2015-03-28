@@ -1,5 +1,14 @@
 package org.asciidoctor;
 
+import org.asciidoctor.ast.DocumentHeader;
+import org.asciidoctor.ast.DocumentRuby;
+import org.asciidoctor.ast.StructuredDocument;
+import org.asciidoctor.converter.JavaConverterRegistry;
+import org.asciidoctor.extension.JavaExtensionRegistry;
+import org.asciidoctor.extension.RubyExtensionRegistry;
+import org.asciidoctor.internal.AsciidoctorProvider;
+import org.jruby.Ruby;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
@@ -7,16 +16,7 @@ import java.io.Writer;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-
-import org.asciidoctor.ast.Document;
-import org.asciidoctor.ast.DocumentHeader;
-import org.asciidoctor.ast.DocumentRuby;
-import org.asciidoctor.ast.StructuredDocument;
-import org.asciidoctor.converter.JavaConverterRegistry;
-import org.asciidoctor.extension.JavaExtensionRegistry;
-import org.asciidoctor.extension.RubyExtensionRegistry;
-import org.asciidoctor.internal.JRubyAsciidoctor;
-import org.jruby.Ruby;
+import java.util.ServiceLoader;
 
 /**
  * 
@@ -89,7 +89,7 @@ public interface Asciidoctor {
      *             exception is thrown.
      */
     void render(Reader contentReader, Writer rendererWriter,
-            Map<String, Object> options) throws IOException;
+                Map<String, Object> options) throws IOException;
 
     /**
      * Parse the document read from reader, and rendered result is sent to
@@ -125,7 +125,7 @@ public interface Asciidoctor {
      *             exception is thrown.
      */
     void render(Reader contentReader, Writer rendererWriter,
-            OptionsBuilder options) throws IOException;
+                OptionsBuilder options) throws IOException;
 
     /**
      * Parse the AsciiDoc source input into an Document {@link DocumentRuby} and
@@ -216,7 +216,7 @@ public interface Asciidoctor {
      *         to a file.
      */
     String[] renderDirectory(DirectoryWalker directoryWalker,
-            Map<String, Object> options);
+                             Map<String, Object> options);
 
     /**
      * Parse all AsciiDoc files found using DirectoryWalker instance.
@@ -241,7 +241,7 @@ public interface Asciidoctor {
      *         to a file.
      */
     String[] renderDirectory(DirectoryWalker directoryWalker,
-            OptionsBuilder options);
+                             OptionsBuilder options);
 
     /**
      * Parses all files added inside a collection.
@@ -254,7 +254,7 @@ public interface Asciidoctor {
      *         to a file.
      */
     String[] renderFiles(Collection<File> asciidoctorFiles,
-            Map<String, Object> options);
+                         Map<String, Object> options);
 
     /**
      * Parses all files added inside a collection.
@@ -279,7 +279,7 @@ public interface Asciidoctor {
      *         to a file.
      */
     String[] renderFiles(Collection<File> asciidoctorFiles,
-            OptionsBuilder options);
+                         OptionsBuilder options);
         
     /**
      * Parse the AsciiDoc source input into an Document {@link DocumentRuby} and
@@ -342,7 +342,7 @@ public interface Asciidoctor {
      *             exception is thrown.
      */
     void convert(Reader contentReader, Writer rendererWriter,
-            Map<String, Object> options) throws IOException;
+                 Map<String, Object> options) throws IOException;
 
     /**
      * Parse the document read from reader, and rendered result is sent to
@@ -378,7 +378,7 @@ public interface Asciidoctor {
      *             exception is thrown.
      */
     void convert(Reader contentReader, Writer rendererWriter,
-            OptionsBuilder options) throws IOException;
+                 OptionsBuilder options) throws IOException;
 
     /**
      * Parse the AsciiDoc source input into an Document {@link DocumentRuby} and
@@ -469,7 +469,7 @@ public interface Asciidoctor {
      *         to a file.
      */
     String[] convertDirectory(DirectoryWalker directoryWalker,
-            Map<String, Object> options);
+                              Map<String, Object> options);
 
     /**
      * Parse all AsciiDoc files found using DirectoryWalker instance.
@@ -494,7 +494,7 @@ public interface Asciidoctor {
      *         to a file.
      */
     String[] convertDirectory(DirectoryWalker directoryWalker,
-            OptionsBuilder options);
+                              OptionsBuilder options);
 
     /**
      * Parses all files added inside a collection.
@@ -507,7 +507,7 @@ public interface Asciidoctor {
      *         to a file.
      */
     String[] convertFiles(Collection<File> asciidoctorFiles,
-            Map<String, Object> options);
+                          Map<String, Object> options);
 
     /**
      * Parses all files added inside a collection.
@@ -532,7 +532,7 @@ public interface Asciidoctor {
      *         to a file.
      */
     String[] convertFiles(Collection<File> asciidoctorFiles,
-            OptionsBuilder options);
+                          OptionsBuilder options);
     
     /**
      * Reads and creates structured document containing header and content chunks.
@@ -545,7 +545,7 @@ public interface Asciidoctor {
      *            a Hash of options to control processing (default: {}).
      * @return structured document.
      */
-    StructuredDocument readDocumentStructure(File filename,Map<String,Object> options);
+    StructuredDocument readDocumentStructure(File filename, Map<String, Object> options);
     
     /**
      * Reads and creates structured document containing header and content chunks.
@@ -559,7 +559,7 @@ public interface Asciidoctor {
      *            a Hash of options to control processing (default: {}).
      * @return structured document.
      */
-    StructuredDocument readDocumentStructure(String content,Map<String,Object> options);
+    StructuredDocument readDocumentStructure(String content, Map<String, Object> options);
 
     /**
      * Reads and creates structured document containing header and content chunks.
@@ -572,7 +572,7 @@ public interface Asciidoctor {
      *            a Hash of options to control processing (default: {}).
      * @return structured document.
      */
-    StructuredDocument readDocumentStructure(Reader contentReader,Map<String,Object> options);
+    StructuredDocument readDocumentStructure(Reader contentReader, Map<String, Object> options);
 
     
     /**
@@ -666,7 +666,7 @@ public interface Asciidoctor {
          *         Ruby calls.
          */
         public static Asciidoctor create() {
-            return JRubyAsciidoctor.create();
+            return getProvider().create();
         }
 
         /**
@@ -679,7 +679,7 @@ public interface Asciidoctor {
          *         Ruby calls.
          */
         public static Asciidoctor create(Ruby rubyRuntime) {
-            return JRubyAsciidoctor.create(rubyRuntime);
+            return getProvider().create(rubyRuntime);
         }
 
         /**
@@ -694,7 +694,7 @@ public interface Asciidoctor {
          *         Ruby calls.
          */
         public static Asciidoctor create(String gemPath) {
-            return JRubyAsciidoctor.create(gemPath);
+            return getProvider().create(gemPath);
         }
         
         /**
@@ -708,7 +708,7 @@ public interface Asciidoctor {
          *         Ruby calls.
          */
         public static Asciidoctor create(List<String> loadPaths) {
-            return JRubyAsciidoctor.create(loadPaths);
+            return getProvider().create(loadPaths);
         }
 
         /**
@@ -720,7 +720,7 @@ public interface Asciidoctor {
          *         Ruby calls.
          */
         public static Asciidoctor create(ClassLoader classloader) {
-            return JRubyAsciidoctor.create(classloader);
+            return getProvider(classloader).create(classloader);
         }
 
         /**
@@ -730,7 +730,15 @@ public interface Asciidoctor {
          * @return Asciidoctor instance which uses JRuby to wraps Asciidoctor
          */
         public static Asciidoctor create(ClassLoader classloader, String gemPath) {
-            return JRubyAsciidoctor.create(classloader, gemPath);
+            return getProvider(classloader).create(classloader, gemPath);
+        }
+
+        private static AsciidoctorProvider getProvider() {
+            return ServiceLoader.load(AsciidoctorProvider.class).iterator().next();
+        }
+
+        private static AsciidoctorProvider getProvider(ClassLoader classloader) {
+            return ServiceLoader.load(AsciidoctorProvider.class, classloader).iterator().next();
         }
 
     }
@@ -741,7 +749,7 @@ public interface Asciidoctor {
      * @param options 
      * @return Document of given content.
      */
-    Document load(String content, Map<String, Object> options);
+    DocumentRuby load(String content, Map<String, Object> options);
 
     /**
      * Loads AsciiDoc content from file and returns the Document object.
@@ -749,7 +757,7 @@ public interface Asciidoctor {
      * @param options 
      * @return Document of given content.
      */
-    Document loadFile(File file, Map<String, Object> options);
+    DocumentRuby loadFile(File file, Map<String, Object> options);
 
 
 }

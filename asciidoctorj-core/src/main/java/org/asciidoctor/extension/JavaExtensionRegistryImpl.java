@@ -12,23 +12,23 @@ import org.asciidoctor.internal.AsciidoctorModule;
 import org.jruby.Ruby;
 import org.jruby.RubyClass;
 
-public class JavaExtensionRegistry {
+public class JavaExtensionRegistryImpl implements JavaExtensionRegistry {
 
     private AsciidoctorModule asciidoctorModule;
     private Ruby rubyRuntime;
     
-    public JavaExtensionRegistry(AsciidoctorModule asciidoctorModule, Ruby rubyRuntime) {
+    public JavaExtensionRegistryImpl(AsciidoctorModule asciidoctorModule, Ruby rubyRuntime) {
         super();
         this.asciidoctorModule = asciidoctorModule;
         this.rubyRuntime = rubyRuntime;
     }
 
-    public void docinfoProcessor(Class<? extends DocinfoProcessor> docInfoProcessor) {
+    public void docinfoProcessor(DocinfoProcessor docInfoProcessor) {
         RubyClass rubyClass = DocinfoProcessorProxy.register(rubyRuntime, docInfoProcessor);
         this.asciidoctorModule.docinfo_processor(rubyClass);
     }
 
-    public void docinfoProcessor(DocinfoProcessor docInfoProcessor) {
+    public void docinfoProcessor(Class<? extends DocinfoProcessor> docInfoProcessor) {
         RubyClass rubyClass = DocinfoProcessorProxy.register(rubyRuntime, docInfoProcessor);
         this.asciidoctorModule.docinfo_processor(rubyClass);
     }

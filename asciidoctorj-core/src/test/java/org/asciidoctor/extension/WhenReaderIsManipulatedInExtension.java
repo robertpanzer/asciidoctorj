@@ -1,21 +1,18 @@
 package org.asciidoctor.extension;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import org.asciidoctor.Asciidoctor;
+import org.asciidoctor.util.ClasspathResources;
+import org.jboss.arquillian.junit.Arquillian;
+import org.jboss.arquillian.test.api.ArquillianResource;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import java.io.File;
 import java.util.HashMap;
 
-import org.arquillian.jruby.api.RubyResource;
-import org.asciidoctor.Asciidoctor;
-import org.asciidoctor.internal.JRubyAsciidoctor;
-import org.asciidoctor.util.ClasspathResources;
-import org.jboss.arquillian.junit.Arquillian;
-import org.jruby.Ruby;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
 
 @RunWith(Arquillian.class)
 public class WhenReaderIsManipulatedInExtension {
@@ -24,11 +21,9 @@ public class WhenReaderIsManipulatedInExtension {
     public ClasspathResources classpath = new ClasspathResources();
 
 	@Test
-	public void currentLineNumberShouldBeReturned(@RubyResource Ruby rubyInstance) {
+	public void currentLineNumberShouldBeReturned(@ArquillianResource Asciidoctor asciidoctor) {
 
-        Asciidoctor asciidoctor = JRubyAsciidoctor.create(rubyInstance);
-
-		JavaExtensionRegistry javaExtensionRegistry = asciidoctor
+        JavaExtensionRegistry javaExtensionRegistry = asciidoctor
 				.javaExtensionRegistry();
 
 		javaExtensionRegistry.preprocessor(NumberLinesPreprocessor.class);
@@ -41,9 +36,7 @@ public class WhenReaderIsManipulatedInExtension {
 	}
 
 	@Test
-	public void hasMoreLinesShouldBeReturned(@RubyResource Ruby rubyInstance) {
-
-        Asciidoctor asciidoctor = JRubyAsciidoctor.create(rubyInstance);
+	public void hasMoreLinesShouldBeReturned(@ArquillianResource Asciidoctor asciidoctor) {
 
         JavaExtensionRegistry javaExtensionRegistry = asciidoctor
 				.javaExtensionRegistry();
@@ -62,9 +55,7 @@ public class WhenReaderIsManipulatedInExtension {
 	}
 	
 	@Test
-	public void isNextLineEmptyShouldBeReturned(@RubyResource Ruby rubyInstance) {
-
-        Asciidoctor asciidoctor = JRubyAsciidoctor.create(rubyInstance);
+	public void isNextLineEmptyShouldBeReturned(@ArquillianResource Asciidoctor asciidoctor) {
 
         JavaExtensionRegistry javaExtensionRegistry = asciidoctor
 				.javaExtensionRegistry();

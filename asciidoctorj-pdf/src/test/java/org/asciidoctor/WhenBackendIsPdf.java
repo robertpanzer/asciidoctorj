@@ -8,19 +8,21 @@ import java.io.File;
 
 import org.asciidoctor.Asciidoctor;
 import org.asciidoctor.util.ClasspathResources;
+import org.jboss.arquillian.junit.Arquillian;
+import org.jboss.arquillian.test.api.ArquillianResource;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.Ignore;
+import org.junit.runner.RunWith;
 
+@RunWith(Arquillian.class)
 public class WhenBackendIsPdf {
-
-    private Asciidoctor asciidoctor = Asciidoctor.Factory.create();
 
     @Rule
     public ClasspathResources classpath = new ClasspathResources();
 
     @Test
-    public void pdf_should_be_rendered_for_pdf_backend() {
+    public void pdf_should_be_rendered_for_pdf_backend(@ArquillianResource Asciidoctor asciidoctor) {
         File inputFile = classpath.getResource("sample.adoc");
         File outputFile1 = new File(inputFile.getParentFile(), "sample.pdf");
         File outputFile2 = new File(inputFile.getParentFile(), "sample.pdfmarks");

@@ -90,9 +90,9 @@ public class Processor {
                 "new", parameters, Inline.class);
     }
     
-    protected Document document(DocumentRuby documentRuby) {
-    	return new Document(documentRuby, rubyRuntime);
-    }
+//    protected Document document(DocumentRuby documentRuby) {
+//    	return new Document(documentRuby, rubyRuntime);
+//    }
     
     private Block createBlock(AbstractBlock parent, String context,
             Map<Object, Object> options) {

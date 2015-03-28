@@ -1,7 +1,5 @@
 package org.asciidoctor.ast;
 
-import org.jruby.RubySymbol;
-
 import java.util.List;
 import java.util.Map;
 
@@ -23,7 +21,7 @@ public interface DocumentRuby extends AbstractBlock {
      * @return String if partition flag is not set to false or not present, Title if partition is set to true.
      * @see Title
      */
-    Object doctitle();
+    String doctitle();
 
     /**
      * 

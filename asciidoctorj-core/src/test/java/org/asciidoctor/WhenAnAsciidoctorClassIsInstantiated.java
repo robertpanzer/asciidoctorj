@@ -1,13 +1,20 @@
 package org.asciidoctor;
 
-import static org.asciidoctor.AttributesBuilder.attributes;
-import static org.asciidoctor.OptionsBuilder.options;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.nullValue;
-import static org.hamcrest.collection.IsArrayWithSize.arrayWithSize;
-import static org.junit.Assert.assertThat;
-import static org.xmlmatchers.xpath.HasXPath.hasXPath;
+import com.google.common.io.CharStreams;
+import org.asciidoctor.internal.AsciidoctorCoreException;
+import org.asciidoctor.util.ClasspathResources;
+import org.jboss.arquillian.junit.Arquillian;
+import org.jboss.arquillian.test.api.ArquillianResource;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
+import org.junit.runner.RunWith;
+import org.xml.sax.SAXException;
 
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.Source;
+import javax.xml.transform.dom.DOMSource;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -24,25 +31,13 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.Source;
-import javax.xml.transform.dom.DOMSource;
-
-import org.arquillian.jruby.api.RubyResource;
-import org.asciidoctor.internal.AsciidoctorCoreException;
-import org.asciidoctor.internal.JRubyAsciidoctor;
-import org.asciidoctor.util.ClasspathResources;
-import org.jboss.arquillian.junit.Arquillian;
-import org.jruby.Ruby;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
-import org.junit.runner.RunWith;
-import org.xml.sax.SAXException;
-
-import com.google.common.io.CharStreams;
+import static org.asciidoctor.AttributesBuilder.attributes;
+import static org.asciidoctor.OptionsBuilder.options;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.collection.IsArrayWithSize.arrayWithSize;
+import static org.junit.Assert.assertThat;
+import static org.xmlmatchers.xpath.HasXPath.hasXPath;
 
 @RunWith(Arquillian.class)
 public class WhenAnAsciidoctorClassIsInstantiated {
@@ -55,10 +50,8 @@ public class WhenAnAsciidoctorClassIsInstantiated {
 
 
     @Test
-    public void content_should_be_read_from_reader_and_written_to_writer(@RubyResource Ruby rubyInstance) throws IOException, SAXException,
+    public void content_should_be_read_from_reader_and_written_to_writer(@ArquillianResource Asciidoctor asciidoctor) throws IOException, SAXException,
             ParserConfigurationException {
-        Asciidoctor asciidoctor = JRubyAsciidoctor.create(rubyInstance);
-
         FileReader inputAsciidoctorFile = new FileReader(classpath.getResource("rendersample.asciidoc"));
         StringWriter rendererWriter = new StringWriter();
         asciidoctor.render(inputAsciidoctorFile, rendererWriter, options().asMap());
@@ -69,10 +62,8 @@ public class WhenAnAsciidoctorClassIsInstantiated {
     }
 
     @Test
-    public void file_document_should_be_rendered_into_default_backend(@RubyResource Ruby rubyInstance) throws IOException, SAXException,
+    public void file_document_should_be_rendered_into_default_backend(@ArquillianResource Asciidoctor asciidoctor) throws IOException, SAXException,
             ParserConfigurationException {
-        Asciidoctor asciidoctor = JRubyAsciidoctor.create(rubyInstance);
-
         String render_file = asciidoctor.renderFile(classpath.getResource("rendersample.asciidoc"),
                 options().toFile(false).get());
         assertRenderedFile(render_file);
@@ -80,10 +71,8 @@ public class WhenAnAsciidoctorClassIsInstantiated {
     }
 
     @Test
-    public void file_document_should_be_rendered_into_current_directory_using_options_class(@RubyResource Ruby rubyInstance)
+    public void file_document_should_be_rendered_into_current_directory_using_options_class(@ArquillianResource Asciidoctor asciidoctor)
             throws FileNotFoundException, IOException, SAXException, ParserConfigurationException {
-        Asciidoctor asciidoctor = JRubyAsciidoctor.create(rubyInstance);
-
         Options options = options().inPlace(true).get();
         File inputFile = classpath.getResource("rendersample.asciidoc");
         String renderContent = asciidoctor.renderFile(inputFile, options);
@@ -97,10 +86,8 @@ public class WhenAnAsciidoctorClassIsInstantiated {
     }
 
     @Test
-    public void file_document_should_be_rendered_into_current_directory(@RubyResource Ruby rubyInstance) throws FileNotFoundException, IOException,
+    public void file_document_should_be_rendered_into_current_directory(@ArquillianResource Asciidoctor asciidoctor) throws FileNotFoundException, IOException,
             SAXException, ParserConfigurationException {
-        Asciidoctor asciidoctor = JRubyAsciidoctor.create(rubyInstance);
-
         File inputFile = classpath.getResource("rendersample.asciidoc");
         String renderContent = asciidoctor.renderFile(inputFile, options()
                 .inPlace(true).asMap());
@@ -114,10 +101,8 @@ public class WhenAnAsciidoctorClassIsInstantiated {
     }
 
     @Test
-    public void file_document_should_be_rendered_into_foreign_directory(@RubyResource Ruby rubyInstance) throws FileNotFoundException, IOException,
+    public void file_document_should_be_rendered_into_foreign_directory(@ArquillianResource Asciidoctor asciidoctor) throws FileNotFoundException, IOException,
             SAXException, ParserConfigurationException {
-        Asciidoctor asciidoctor = JRubyAsciidoctor.create(rubyInstance);
-
         Map<String, Object> options = options().inPlace(false).safe(SafeMode.UNSAFE).toDir(testFolder.getRoot())
                 .asMap();
         String renderContent = asciidoctor.renderFile(classpath.getResource("rendersample.asciidoc"), options);
@@ -131,9 +116,7 @@ public class WhenAnAsciidoctorClassIsInstantiated {
     }
 
     @Test
-    public void file_document_should_be_rendered_from_base_dir(@RubyResource Ruby rubyInstance) throws IOException {
-        Asciidoctor asciidoctor = JRubyAsciidoctor.create(rubyInstance);
-
+    public void file_document_should_be_rendered_from_base_dir(@ArquillianResource Asciidoctor asciidoctor) throws IOException {
         File output = testFolder.newFolder("asciidoc", "docs");
         Options options = options().inPlace(false).baseDir(testFolder.getRoot())
                 .toFile(new File("asciidoc/docs/rendersample.html")).get();
@@ -146,10 +129,8 @@ public class WhenAnAsciidoctorClassIsInstantiated {
     }
 
     @Test
-    public void file_document_should_be_rendered_into_foreign_directory_using_options_class(@RubyResource Ruby rubyInstance)
+    public void file_document_should_be_rendered_into_foreign_directory_using_options_class(@ArquillianResource Asciidoctor asciidoctor)
             throws FileNotFoundException, IOException, SAXException, ParserConfigurationException {
-        Asciidoctor asciidoctor = JRubyAsciidoctor.create(rubyInstance);
-
         Options options = options().inPlace(false).safe(SafeMode.UNSAFE).toDir(testFolder.getRoot()).get();
 
         String renderContent = asciidoctor.renderFile(classpath.getResource("rendersample.asciidoc"), options);
@@ -161,10 +142,8 @@ public class WhenAnAsciidoctorClassIsInstantiated {
     }
 
     @Test
-    public void docbook_document_should_be_rendered_into_current_directory(@RubyResource Ruby rubyInstance) throws FileNotFoundException, IOException,
+    public void docbook_document_should_be_rendered_into_current_directory(@ArquillianResource Asciidoctor asciidoctor) throws FileNotFoundException, IOException,
             SAXException, ParserConfigurationException {
-        Asciidoctor asciidoctor = JRubyAsciidoctor.create(rubyInstance);
-
         Map<String, Object> attributes = attributes().backend("docbook").asMap();
         Map<String, Object> options = options().inPlace(true).attributes(attributes).asMap();
 
@@ -180,10 +159,8 @@ public class WhenAnAsciidoctorClassIsInstantiated {
     }
 
     @Test
-    public void docbook_document_should_be_rendered_into_current_directory_using_options_class(@RubyResource Ruby rubyInstance)
+    public void docbook_document_should_be_rendered_into_current_directory_using_options_class(@ArquillianResource Asciidoctor asciidoctor)
             throws FileNotFoundException, IOException, SAXException, ParserConfigurationException {
-        Asciidoctor asciidoctor = JRubyAsciidoctor.create(rubyInstance);
-
         Attributes attributes = attributes().backend("docbook").get();
         Options options = options().inPlace(true).attributes(attributes).get();
 
@@ -199,10 +176,8 @@ public class WhenAnAsciidoctorClassIsInstantiated {
     }
 
     @Test
-    public void docbook_document_should_be_rendered_into_current_directory_using_options_backend_attribute(@RubyResource Ruby rubyInstance)
+    public void docbook_document_should_be_rendered_into_current_directory_using_options_backend_attribute(@ArquillianResource Asciidoctor asciidoctor)
             throws FileNotFoundException, IOException, SAXException, ParserConfigurationException {
-        Asciidoctor asciidoctor = JRubyAsciidoctor.create(rubyInstance);
-
         Options options = options().inPlace(true).backend("docbook").get();
 
         File inputFile = classpath.getResource("rendersample.asciidoc");
@@ -217,10 +192,8 @@ public class WhenAnAsciidoctorClassIsInstantiated {
     }
 
     @Test
-    public void string_content_with_custom_date_should_be_rendered(@RubyResource Ruby rubyInstance) throws IOException, SAXException,
+    public void string_content_with_custom_date_should_be_rendered(@ArquillianResource Asciidoctor asciidoctor) throws IOException, SAXException,
             ParserConfigurationException {
-        Asciidoctor asciidoctor = JRubyAsciidoctor.create(rubyInstance);
-
         InputStream content = new FileInputStream(classpath.getResource("documentwithdate.asciidoc"));
 
         Calendar customDate = Calendar.getInstance();
@@ -237,10 +210,8 @@ public class WhenAnAsciidoctorClassIsInstantiated {
     }
 
     @Test
-    public void string_content_with_custom_time_should_be_rendered(@RubyResource Ruby rubyInstance) throws IOException, SAXException,
+    public void string_content_with_custom_time_should_be_rendered(@ArquillianResource Asciidoctor asciidoctor) throws IOException, SAXException,
             ParserConfigurationException {
-        Asciidoctor asciidoctor = JRubyAsciidoctor.create(rubyInstance);
-
         InputStream content = new FileInputStream(classpath.getResource("documentwithtime.asciidoc"));
 
         Calendar customTime = Calendar.getInstance();
@@ -260,10 +231,8 @@ public class WhenAnAsciidoctorClassIsInstantiated {
     }
 
     @Test
-    public void string_content_document_should_be_rendered_into_default_backend(@RubyResource Ruby rubyInstance) throws IOException, SAXException,
+    public void string_content_document_should_be_rendered_into_default_backend(@ArquillianResource Asciidoctor asciidoctor) throws IOException, SAXException,
             ParserConfigurationException {
-        Asciidoctor asciidoctor = JRubyAsciidoctor.create(rubyInstance);
-
         InputStream content = new FileInputStream(classpath.getResource("rendersample.asciidoc"));
         String render_file = asciidoctor.render(toString(content), new HashMap<String, Object>());
 
@@ -271,9 +240,7 @@ public class WhenAnAsciidoctorClassIsInstantiated {
     }
 
     @Test
-    public void all_files_from_a_collection_should_be_rendered_into_an_array(@RubyResource Ruby rubyInstance) {
-        Asciidoctor asciidoctor = JRubyAsciidoctor.create(rubyInstance);
-
+    public void all_files_from_a_collection_should_be_rendered_into_an_array(@ArquillianResource Asciidoctor asciidoctor) {
         String[] allRenderedFiles = asciidoctor.renderFiles(
                 Arrays.asList(classpath.getResource("rendersample.asciidoc")), options().toFile(false).get());
         assertThat(allRenderedFiles, is(arrayWithSize(1)));
@@ -281,9 +248,7 @@ public class WhenAnAsciidoctorClassIsInstantiated {
     }
 
     @Test
-    public void all_files_from_a_collection_should_be_rendered_into_files_and_not_in_array(@RubyResource Ruby rubyInstance) {
-        Asciidoctor asciidoctor = JRubyAsciidoctor.create(rubyInstance);
-
+    public void all_files_from_a_collection_should_be_rendered_into_files_and_not_in_array(@ArquillianResource Asciidoctor asciidoctor) {
         Map<String, Object> options = options().inPlace(false).safe(SafeMode.UNSAFE).toDir(testFolder.getRoot())
                 .asMap();
 
@@ -294,9 +259,7 @@ public class WhenAnAsciidoctorClassIsInstantiated {
     }
 
     @Test
-    public void all_files_from_directory_and_subdirectories_should_be_rendered_into_an_array(@RubyResource Ruby rubyInstance) {
-        Asciidoctor asciidoctor = JRubyAsciidoctor.create(rubyInstance);
-
+    public void all_files_from_directory_and_subdirectories_should_be_rendered_into_an_array(@ArquillianResource Asciidoctor asciidoctor) {
         File pathToWalk = classpath.getResource("src");
 
         String[] allRenderedFiles = asciidoctor.renderDirectory(new AsciiDocDirectoryWalker(
@@ -307,9 +270,7 @@ public class WhenAnAsciidoctorClassIsInstantiated {
     }
 
     @Test
-    public void all_files_from_directory_and_subdirectories_should_be_rendered_into_files_and_not_in_array(@RubyResource Ruby rubyInstance) {
-        Asciidoctor asciidoctor = JRubyAsciidoctor.create(rubyInstance);
-
+    public void all_files_from_directory_and_subdirectories_should_be_rendered_into_files_and_not_in_array(@ArquillianResource Asciidoctor asciidoctor) {
         File pathToWalk = classpath.getResource("src");
         Map<String, Object> options = options().inPlace(false).safe(SafeMode.UNSAFE).toDir(testFolder.getRoot())
                 .asMap();
@@ -322,8 +283,7 @@ public class WhenAnAsciidoctorClassIsInstantiated {
     }
 
     @Test(expected = AsciidoctorCoreException.class)
-    public void an_exception_should_be_thrown_if_backend_cannot_be_resolved(@RubyResource Ruby rubyInstance) {
-        Asciidoctor asciidoctor = JRubyAsciidoctor.create(rubyInstance);
+    public void an_exception_should_be_thrown_if_backend_cannot_be_resolved(@ArquillianResource Asciidoctor asciidoctor) {
         Options options = options().inPlace(true).backend("mybackend").get();
 
         File inputFile = classpath.getResource("rendersample.asciidoc");
