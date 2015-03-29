@@ -9,6 +9,7 @@ import org.jboss.arquillian.core.api.annotation.ApplicationScoped;
 import org.jboss.arquillian.core.api.annotation.Inject;
 import org.jboss.arquillian.core.api.annotation.Observes;
 import org.jboss.arquillian.test.api.ArquillianResource;
+import org.jboss.arquillian.test.spi.event.suite.AfterClass;
 import org.jboss.arquillian.test.spi.event.suite.Before;
 import org.jboss.arquillian.test.spi.event.suite.BeforeClass;
 
@@ -55,6 +56,11 @@ public class AsciidoctorTestObserver {
                     Asciidoctor.Factory.create(scopedRuby.get().getTestScopedScriptingContainer().getProvider().getRuntime()));
         }
 
+    }
+
+    public void cleanAsciidoctorInstances(@Observes AfterClass afterClass) {
+        scopedAsciidoctor.get().setClassScopedAsciidoctor(null);
+        scopedAsciidoctor.get().setTestScopedAsciidoctor(null);
     }
 
     private boolean isTestClassRequiringAsciidoctor(Class<?> testClass) {
