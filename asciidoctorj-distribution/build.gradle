@@ -1,4 +1,5 @@
 dependencies {
+  compile project(':asciidoctorj-api')
   compile project(':asciidoctorj')
   compile project(':asciidoctorj-epub3')
   compile project(':asciidoctorj-pdf')
