@@ -1,13 +1,21 @@
 package org.asciidoctor.extension;
 
-import static org.asciidoctor.OptionsBuilder.options;
-import static org.hamcrest.CoreMatchers.containsString;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.not;
-import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.hamcrest.CoreMatchers.startsWith;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
+import org.asciidoctor.Asciidoctor;
+import org.asciidoctor.Options;
+import org.asciidoctor.SafeMode;
+import org.asciidoctor.ast.DocumentRuby;
+import org.asciidoctor.util.ClasspathResources;
+import org.jboss.arquillian.junit.Arquillian;
+import org.jboss.arquillian.test.api.ArquillianResource;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
+import org.junit.Ignore;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
+import org.junit.runner.RunWith;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -17,25 +25,15 @@ import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.asciidoctor.Asciidoctor;
-import org.asciidoctor.Options;
-import org.asciidoctor.SafeMode;
-import org.asciidoctor.ast.DocumentRuby;
-import org.asciidoctor.internal.JRubyAsciidoctor;
-import org.asciidoctor.util.ClasspathResources;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
-import org.junit.Ignore;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import static org.asciidoctor.OptionsBuilder.options;
+import static org.hamcrest.CoreMatchers.*;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
 
+@RunWith(Arquillian.class)
 public class WhenJavaExtensionIsRegistered {
 
     @Rule
@@ -43,8 +41,6 @@ public class WhenJavaExtensionIsRegistered {
 
     @Rule
     public TemporaryFolder testFolder = new TemporaryFolder();
-
-    private Asciidoctor asciidoctor = JRubyAsciidoctor.create();
 
     class RubyIncludeSource extends IncludeProcessor {
 
@@ -92,9 +88,9 @@ public class WhenJavaExtensionIsRegistered {
     }
 
     @Test
-    public void an_inner_class_should_be_registered() {
+    public void an_inner_class_should_be_registered(@ArquillianResource Asciidoctor asciidoctor) {
 
-        JavaExtensionRegistry javaExtensionRegistry = this.asciidoctor.javaExtensionRegistry();
+        JavaExtensionRegistry javaExtensionRegistry = asciidoctor.javaExtensionRegistry();
 
         javaExtensionRegistry.includeProcessor(new RubyIncludeSource(new HashMap<String, Object>()));
 
@@ -111,9 +107,9 @@ public class WhenJavaExtensionIsRegistered {
     }
 
     @Test
-    public void an_inner_anonymous_class_should_be_registered() {
+    public void an_inner_anonymous_class_should_be_registered(@ArquillianResource Asciidoctor asciidoctor) {
 
-        JavaExtensionRegistry javaExtensionRegistry = this.asciidoctor.javaExtensionRegistry();
+        JavaExtensionRegistry javaExtensionRegistry = asciidoctor.javaExtensionRegistry();
 
         javaExtensionRegistry.includeProcessor(new IncludeProcessor(new HashMap<String, Object>()) {
 
@@ -168,8 +164,9 @@ public class WhenJavaExtensionIsRegistered {
     }
 
     @Test
-    public void a_docinfoprocessor_should_be_executed_and_add_meta_in_header_by_default() {
-        JavaExtensionRegistry javaExtensionRegistry = this.asciidoctor.javaExtensionRegistry();
+    public void a_docinfoprocessor_should_be_executed_and_add_meta_in_header_by_default(@ArquillianResource Asciidoctor asciidoctor) {
+
+        JavaExtensionRegistry javaExtensionRegistry = asciidoctor.javaExtensionRegistry();
 
         javaExtensionRegistry.docinfoProcessor(MetaRobotsDocinfoProcessor.class.getCanonicalName());
 
@@ -184,8 +181,9 @@ public class WhenJavaExtensionIsRegistered {
     }
 
     @Test
-    public void a_docinfoprocessor_should_be_executed_and_add_meta_in_footer() {
-        JavaExtensionRegistry javaExtensionRegistry = this.asciidoctor.javaExtensionRegistry();
+    public void a_docinfoprocessor_should_be_executed_and_add_meta_in_footer(@ArquillianResource Asciidoctor asciidoctor) {
+
+        JavaExtensionRegistry javaExtensionRegistry = asciidoctor.javaExtensionRegistry();
 
         Map<String, Object> options = new HashMap<String, Object>();
         options.put("location", ":footer");
@@ -205,9 +203,9 @@ public class WhenJavaExtensionIsRegistered {
     }
 
     @Test
-    public void a_preprocessor_should_be_executed_before_document_is_rendered() {
+    public void a_preprocessor_should_be_executed_before_document_is_rendered(@ArquillianResource Asciidoctor asciidoctor) {
 
-        JavaExtensionRegistry javaExtensionRegistry = this.asciidoctor.javaExtensionRegistry();
+        JavaExtensionRegistry javaExtensionRegistry = asciidoctor.javaExtensionRegistry();
 
         javaExtensionRegistry.preprocessor(ChangeAttributeValuePreprocessor.class);
 
@@ -222,9 +220,9 @@ public class WhenJavaExtensionIsRegistered {
     }
 
     @Test
-    public void a_preprocessor_as_string_should_be_executed_before_document_is_rendered() {
+    public void a_preprocessor_as_string_should_be_executed_before_document_is_rendered(@ArquillianResource Asciidoctor asciidoctor) {
 
-        JavaExtensionRegistry javaExtensionRegistry = this.asciidoctor.javaExtensionRegistry();
+        JavaExtensionRegistry javaExtensionRegistry = asciidoctor.javaExtensionRegistry();
 
         javaExtensionRegistry.preprocessor("org.asciidoctor.extension.ChangeAttributeValuePreprocessor");
 
@@ -239,9 +237,9 @@ public class WhenJavaExtensionIsRegistered {
     }
 
     @Test
-    public void a_preprocessor_instance_should_be_executed_before_document_is_rendered() {
+    public void a_preprocessor_instance_should_be_executed_before_document_is_rendered(@ArquillianResource Asciidoctor asciidoctor) {
 
-        JavaExtensionRegistry javaExtensionRegistry = this.asciidoctor.javaExtensionRegistry();
+        JavaExtensionRegistry javaExtensionRegistry = asciidoctor.javaExtensionRegistry();
 
         javaExtensionRegistry.preprocessor(new ChangeAttributeValuePreprocessor(new HashMap<String, Object>()));
 
@@ -256,9 +254,9 @@ public class WhenJavaExtensionIsRegistered {
     }
 
     @Test
-    public void a_postprocessor_as_string_should_be_executed_after_document_is_rendered() throws IOException {
+    public void a_postprocessor_as_string_should_be_executed_after_document_is_rendered(@ArquillianResource Asciidoctor asciidoctor) throws IOException {
 
-        JavaExtensionRegistry javaExtensionRegistry = this.asciidoctor.javaExtensionRegistry();
+        JavaExtensionRegistry javaExtensionRegistry = asciidoctor.javaExtensionRegistry();
 
         javaExtensionRegistry.postprocessor("org.asciidoctor.extension.CustomFooterPostProcessor");
 
@@ -275,9 +273,9 @@ public class WhenJavaExtensionIsRegistered {
     }
 
     @Test
-    public void a_postprocessor_should_be_executed_after_document_is_rendered() throws IOException {
+    public void a_postprocessor_should_be_executed_after_document_is_rendered(@ArquillianResource Asciidoctor asciidoctor) throws IOException {
 
-        JavaExtensionRegistry javaExtensionRegistry = this.asciidoctor.javaExtensionRegistry();
+        JavaExtensionRegistry javaExtensionRegistry = asciidoctor.javaExtensionRegistry();
 
         javaExtensionRegistry.postprocessor(CustomFooterPostProcessor.class);
 
@@ -294,9 +292,9 @@ public class WhenJavaExtensionIsRegistered {
     }
 
     @Test
-    public void a_postprocessor_instance_should_be_executed_after_document_is_rendered() throws IOException {
+    public void a_postprocessor_instance_should_be_executed_after_document_is_rendered(@ArquillianResource Asciidoctor asciidoctor) throws IOException {
 
-        JavaExtensionRegistry javaExtensionRegistry = this.asciidoctor.javaExtensionRegistry();
+        JavaExtensionRegistry javaExtensionRegistry = asciidoctor.javaExtensionRegistry();
 
         javaExtensionRegistry.postprocessor(new CustomFooterPostProcessor(new HashMap<String, Object>()));
 
@@ -313,9 +311,9 @@ public class WhenJavaExtensionIsRegistered {
     }
 
     @Test
-    public void a_include_processor_as_string_should_be_executed_when_include_macro_is_found() {
+    public void a_include_processor_as_string_should_be_executed_when_include_macro_is_found(@ArquillianResource Asciidoctor asciidoctor) {
 
-        JavaExtensionRegistry javaExtensionRegistry = this.asciidoctor.javaExtensionRegistry();
+        JavaExtensionRegistry javaExtensionRegistry = asciidoctor.javaExtensionRegistry();
 
         javaExtensionRegistry.includeProcessor("org.asciidoctor.extension.UriIncludeProcessor");
 
@@ -332,9 +330,9 @@ public class WhenJavaExtensionIsRegistered {
     }
 
     @Test
-    public void a_include_processor_should_be_executed_when_include_macro_is_found() {
+    public void a_include_processor_should_be_executed_when_include_macro_is_found(@ArquillianResource Asciidoctor asciidoctor) {
 
-        JavaExtensionRegistry javaExtensionRegistry = this.asciidoctor.javaExtensionRegistry();
+        JavaExtensionRegistry javaExtensionRegistry = asciidoctor.javaExtensionRegistry();
 
         javaExtensionRegistry.includeProcessor(UriIncludeProcessor.class);
 
@@ -351,9 +349,9 @@ public class WhenJavaExtensionIsRegistered {
     }
 
     @Test
-    public void a_include_instance_processor_should_be_executed_when_include_macro_is_found() {
+    public void a_include_instance_processor_should_be_executed_when_include_macro_is_found(@ArquillianResource Asciidoctor asciidoctor) {
 
-        JavaExtensionRegistry javaExtensionRegistry = this.asciidoctor.javaExtensionRegistry();
+        JavaExtensionRegistry javaExtensionRegistry = asciidoctor.javaExtensionRegistry();
 
         javaExtensionRegistry.includeProcessor(new UriIncludeProcessor(new HashMap<String, Object>()));
 
@@ -370,9 +368,9 @@ public class WhenJavaExtensionIsRegistered {
     }
 
     @Test
-    public void a_treeprocessor_should_be_executed_in_document() {
+    public void a_treeprocessor_should_be_executed_in_document(@ArquillianResource Asciidoctor asciidoctor) {
 
-        JavaExtensionRegistry javaExtensionRegistry = this.asciidoctor.javaExtensionRegistry();
+        JavaExtensionRegistry javaExtensionRegistry = asciidoctor.javaExtensionRegistry();
 
         javaExtensionRegistry.treeprocessor(TerminalCommandTreeprocessor.class);
 
@@ -391,9 +389,9 @@ public class WhenJavaExtensionIsRegistered {
     }
 
     @Test
-    public void a_treeprocessor_as_string_should_be_executed_in_document() {
+    public void a_treeprocessor_as_string_should_be_executed_in_document(@ArquillianResource Asciidoctor asciidoctor) {
 
-        JavaExtensionRegistry javaExtensionRegistry = this.asciidoctor.javaExtensionRegistry();
+        JavaExtensionRegistry javaExtensionRegistry = asciidoctor.javaExtensionRegistry();
 
         javaExtensionRegistry.treeprocessor("org.asciidoctor.extension.TerminalCommandTreeprocessor");
 
@@ -412,9 +410,9 @@ public class WhenJavaExtensionIsRegistered {
     }
 
     @Test
-    public void a_treeprocessor_instance_should_be_executed_in_document() {
+    public void a_treeprocessor_instance_should_be_executed_in_document(@ArquillianResource Asciidoctor asciidoctor) {
 
-        JavaExtensionRegistry javaExtensionRegistry = this.asciidoctor.javaExtensionRegistry();
+        JavaExtensionRegistry javaExtensionRegistry = asciidoctor.javaExtensionRegistry();
 
         javaExtensionRegistry.treeprocessor(new TerminalCommandTreeprocessor(new HashMap<String, Object>()));
 
@@ -434,7 +432,7 @@ public class WhenJavaExtensionIsRegistered {
 
     @Test
     @Ignore
-    public void extensions_should_be_correctly_added_using_extension_registry() throws IOException {
+    public void extensions_should_be_correctly_added_using_extension_registry(@ArquillianResource Asciidoctor asciidoctor) throws IOException {
 
         // To avoid registering the same extension over and over for all tests,
         // service is instantiated manually.
@@ -460,9 +458,9 @@ public class WhenJavaExtensionIsRegistered {
     }
 
     @Test
-    public void a_block_macro_extension_should_be_executed_when_macro_is_detected() {
+    public void a_block_macro_extension_should_be_executed_when_macro_is_detected(@ArquillianResource Asciidoctor asciidoctor) {
 
-        JavaExtensionRegistry javaExtensionRegistry = this.asciidoctor.javaExtensionRegistry();
+        JavaExtensionRegistry javaExtensionRegistry = asciidoctor.javaExtensionRegistry();
 
         javaExtensionRegistry.blockMacro("gist", GistMacro.class);
 
@@ -477,9 +475,9 @@ public class WhenJavaExtensionIsRegistered {
     }
 
     @Test
-    public void a_block_macro_extension_instance_should_be_executed_when_macro_is_detected() {
+    public void a_block_macro_extension_instance_should_be_executed_when_macro_is_detected(@ArquillianResource Asciidoctor asciidoctor) {
 
-        JavaExtensionRegistry javaExtensionRegistry = this.asciidoctor.javaExtensionRegistry();
+        JavaExtensionRegistry javaExtensionRegistry = asciidoctor.javaExtensionRegistry();
 
         javaExtensionRegistry.blockMacro(new GistMacro("gist", new HashMap<String, Object>()));
 
@@ -494,9 +492,9 @@ public class WhenJavaExtensionIsRegistered {
     }
 
     @Test
-    public void a_block_macro_as_string_extension_should_be_executed_when_macro_is_detected() {
+    public void a_block_macro_as_string_extension_should_be_executed_when_macro_is_detected(@ArquillianResource Asciidoctor asciidoctor) {
 
-        JavaExtensionRegistry javaExtensionRegistry = this.asciidoctor.javaExtensionRegistry();
+        JavaExtensionRegistry javaExtensionRegistry = asciidoctor.javaExtensionRegistry();
 
         javaExtensionRegistry.blockMacro("gist", "org.asciidoctor.extension.GistMacro");
 
@@ -511,9 +509,9 @@ public class WhenJavaExtensionIsRegistered {
     }
 
     @Test
-    public void a_block_macro_as_instance_extension_should_be_executed_when_macro_is_detected() {
+    public void a_block_macro_as_instance_extension_should_be_executed_when_macro_is_detected(@ArquillianResource Asciidoctor asciidoctor) {
 
-        JavaExtensionRegistry javaExtensionRegistry = this.asciidoctor.javaExtensionRegistry();
+        JavaExtensionRegistry javaExtensionRegistry = asciidoctor.javaExtensionRegistry();
 
         Map<String, Object> options = new HashMap<String, Object>();
         options.put("content_model", ":raw");
@@ -531,9 +529,9 @@ public class WhenJavaExtensionIsRegistered {
     }
 
     @Test
-    public void an_inline_macro_as_string_extension_should_be_executed_when_an_inline_macro_is_detected() {
+    public void an_inline_macro_as_string_extension_should_be_executed_when_an_inline_macro_is_detected(@ArquillianResource Asciidoctor asciidoctor) {
 
-        JavaExtensionRegistry javaExtensionRegistry = this.asciidoctor.javaExtensionRegistry();
+        JavaExtensionRegistry javaExtensionRegistry = asciidoctor.javaExtensionRegistry();
 
         javaExtensionRegistry.inlineMacro("man", "org.asciidoctor.extension.ManpageMacro");
 
@@ -547,9 +545,9 @@ public class WhenJavaExtensionIsRegistered {
     }
 
     @Test
-    public void an_inline_macro_extension_should_be_executed_when_an_inline_macro_is_detected() {
+    public void an_inline_macro_extension_should_be_executed_when_an_inline_macro_is_detected(@ArquillianResource Asciidoctor asciidoctor) {
 
-        JavaExtensionRegistry javaExtensionRegistry = this.asciidoctor.javaExtensionRegistry();
+        JavaExtensionRegistry javaExtensionRegistry = asciidoctor.javaExtensionRegistry();
 
         javaExtensionRegistry.inlineMacro("man", ManpageMacro.class);
 
@@ -564,9 +562,9 @@ public class WhenJavaExtensionIsRegistered {
     }
 
     @Test
-    public void an_inline_macro_as_instance_extension_should_be_executed_when_regexp_is_set_as_option_inline_macro_is_detected() {
+    public void an_inline_macro_as_instance_extension_should_be_executed_when_regexp_is_set_as_option_inline_macro_is_detected(@ArquillianResource Asciidoctor asciidoctor) {
 
-        JavaExtensionRegistry javaExtensionRegistry = this.asciidoctor.javaExtensionRegistry();
+        JavaExtensionRegistry javaExtensionRegistry = asciidoctor.javaExtensionRegistry();
 
         Map<String, Object> options = new HashMap<String, Object>();
         options.put("regexp", "man(?:page)?:(\\S+?)\\[(.*?)\\]");
@@ -586,9 +584,9 @@ public class WhenJavaExtensionIsRegistered {
     }
 
     @Test
-    public void an_inline_macro_as_instance_extension_should_be_executed_when_an_inline_macro_is_detected() {
+    public void an_inline_macro_as_instance_extension_should_be_executed_when_an_inline_macro_is_detected(@ArquillianResource Asciidoctor asciidoctor) {
 
-        JavaExtensionRegistry javaExtensionRegistry = this.asciidoctor.javaExtensionRegistry();
+        JavaExtensionRegistry javaExtensionRegistry = asciidoctor.javaExtensionRegistry();
 
         Map<String, Object> options = new HashMap<String, Object>();
 
@@ -607,9 +605,9 @@ public class WhenJavaExtensionIsRegistered {
     }
 
     @Test
-    public void should_unregister_all_current_registered_extensions() throws IOException {
+    public void should_unregister_all_current_registered_extensions(@ArquillianResource Asciidoctor asciidoctor) throws IOException {
 
-        JavaExtensionRegistry javaExtensionRegistry = this.asciidoctor.javaExtensionRegistry();
+        JavaExtensionRegistry javaExtensionRegistry = asciidoctor.javaExtensionRegistry();
 
         javaExtensionRegistry.postprocessor(CustomFooterPostProcessor.class);
 
@@ -617,7 +615,7 @@ public class WhenJavaExtensionIsRegistered {
                 .safe(SafeMode.UNSAFE).get();
 
         asciidoctor.unregisterAllExtensions();
-        asciidoctor.renderFile(classpath.getResource("rendersample.asciidoc"),options);
+        asciidoctor.renderFile(classpath.getResource("rendersample.asciidoc"), options);
 
         File renderedFile = new File(testFolder.getRoot(), "rendersample.html");
         Document doc = Jsoup.parse(renderedFile, "UTF-8");
@@ -627,10 +625,10 @@ public class WhenJavaExtensionIsRegistered {
     }
 
     @Test
-    public void a_block_processor_as_string_should_be_executed_when_registered_block_is_found_in_document()
+    public void a_block_processor_as_string_should_be_executed_when_registered_block_is_found_in_document(@ArquillianResource Asciidoctor asciidoctor)
             throws IOException {
 
-        JavaExtensionRegistry javaExtensionRegistry = this.asciidoctor.javaExtensionRegistry();
+        JavaExtensionRegistry javaExtensionRegistry = asciidoctor.javaExtensionRegistry();
 
         javaExtensionRegistry.block("yell", "org.asciidoctor.extension.YellStaticBlock");
         String content = asciidoctor.renderFile(
@@ -645,9 +643,9 @@ public class WhenJavaExtensionIsRegistered {
     }
 
     @Test
-    public void a_block_processor_should_be_executed_when_registered_block_is_found_in_document() throws IOException {
+    public void a_block_processor_should_be_executed_when_registered_block_is_found_in_document(@ArquillianResource Asciidoctor asciidoctor) throws IOException {
 
-        JavaExtensionRegistry javaExtensionRegistry = this.asciidoctor.javaExtensionRegistry();
+        JavaExtensionRegistry javaExtensionRegistry = asciidoctor.javaExtensionRegistry();
 
         javaExtensionRegistry.block("yell", YellStaticBlock.class);
         String content = asciidoctor.renderFile(
@@ -662,10 +660,10 @@ public class WhenJavaExtensionIsRegistered {
     }
 
     @Test
-    public void a_block_processor_instance_should_be_executed_when_registered_block_is_found_in_document()
+    public void a_block_processor_instance_should_be_executed_when_registered_block_is_found_in_document(@ArquillianResource Asciidoctor asciidoctor)
             throws IOException {
 
-        JavaExtensionRegistry javaExtensionRegistry = this.asciidoctor.javaExtensionRegistry();
+        JavaExtensionRegistry javaExtensionRegistry = asciidoctor.javaExtensionRegistry();
 
         Map<String, Object> config = new HashMap<String, Object>();
         config.put("contexts", Arrays.asList(":paragraph"));

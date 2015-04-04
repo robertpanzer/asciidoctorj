@@ -1,5 +1,13 @@
 package org.asciidoctor;
 
+import org.asciidoctor.ast.DocumentHeader;
+import org.asciidoctor.ast.DocumentRuby;
+import org.asciidoctor.ast.StructuredDocument;
+import org.asciidoctor.converter.JavaConverterRegistry;
+import org.asciidoctor.extension.JavaExtensionRegistry;
+import org.asciidoctor.extension.RubyExtensionRegistry;
+import org.asciidoctor.internal.AsciidoctorProvider;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
@@ -7,15 +15,7 @@ import java.io.Writer;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-
-import org.asciidoctor.ast.Document;
-import org.asciidoctor.ast.DocumentHeader;
-import org.asciidoctor.ast.DocumentRuby;
-import org.asciidoctor.ast.StructuredDocument;
-import org.asciidoctor.converter.JavaConverterRegistry;
-import org.asciidoctor.extension.JavaExtensionRegistry;
-import org.asciidoctor.extension.RubyExtensionRegistry;
-import org.asciidoctor.internal.JRubyAsciidoctor;
+import java.util.ServiceLoader;
 
 /**
  * 
@@ -665,7 +665,7 @@ public interface Asciidoctor {
          *         Ruby calls.
          */
         public static Asciidoctor create() {
-            return JRubyAsciidoctor.create();
+            return getProvider().create();
         }
 
         /**
@@ -680,7 +680,7 @@ public interface Asciidoctor {
          *         Ruby calls.
          */
         public static Asciidoctor create(String gemPath) {
-            return JRubyAsciidoctor.create(gemPath);
+            return getProvider().create(gemPath);
         }
         
         /**
@@ -694,7 +694,7 @@ public interface Asciidoctor {
          *         Ruby calls.
          */
         public static Asciidoctor create(List<String> loadPaths) {
-            return JRubyAsciidoctor.create(loadPaths);
+            return getProvider().create(loadPaths);
         }
 
         /**
@@ -706,7 +706,7 @@ public interface Asciidoctor {
          *         Ruby calls.
          */
         public static Asciidoctor create(ClassLoader classloader) {
-            return JRubyAsciidoctor.create(classloader);
+            return getProvider(classloader).create(classloader);
         }
 
         /**
@@ -716,7 +716,15 @@ public interface Asciidoctor {
          * @return Asciidoctor instance which uses JRuby to wraps Asciidoctor
          */
         public static Asciidoctor create(ClassLoader classloader, String gemPath) {
-            return JRubyAsciidoctor.create(classloader, gemPath);
+            return getProvider(classloader).create(classloader, gemPath);
+        }
+
+        private static AsciidoctorProvider getProvider() {
+            return ServiceLoader.load(AsciidoctorProvider.class).iterator().next();
+        }
+
+        private static AsciidoctorProvider getProvider(ClassLoader classloader) {
+            return ServiceLoader.load(AsciidoctorProvider.class, classloader).iterator().next();
         }
 
     }
@@ -727,7 +735,7 @@ public interface Asciidoctor {
      * @param options 
      * @return Document of given content.
      */
-    Document load(String content, Map<String, Object> options);
+    DocumentRuby load(String content, Map<String, Object> options);
 
     /**
      * Loads AsciiDoc content from file and returns the Document object.
@@ -735,7 +743,13 @@ public interface Asciidoctor {
      * @param options 
      * @return Document of given content.
      */
-    Document loadFile(File file, Map<String, Object> options);
+    DocumentRuby loadFile(File file, Map<String, Object> options);
 
-
+    /**
+     * Destroys this Asciidoctor instance and cleans up all
+     * resources used by it.
+     * After a call of destroy this instance can no longer be used
+     * for rendering documents.
+     */
+    void destroy();
 }

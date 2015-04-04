@@ -1,28 +1,29 @@
 package org.asciidoctor.extension;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import org.asciidoctor.Asciidoctor;
+import org.asciidoctor.util.ClasspathResources;
+import org.jboss.arquillian.junit.Arquillian;
+import org.jboss.arquillian.test.api.ArquillianResource;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import java.io.File;
 import java.util.HashMap;
 
-import org.asciidoctor.Asciidoctor;
-import org.asciidoctor.internal.JRubyAsciidoctor;
-import org.asciidoctor.util.ClasspathResources;
-import org.junit.Rule;
-import org.junit.Test;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
 
+@RunWith(Arquillian.class)
 public class WhenReaderIsManipulatedInExtension {
 
     @Rule
     public ClasspathResources classpath = new ClasspathResources();
 
-	private Asciidoctor asciidoctor = JRubyAsciidoctor.create();
-
 	@Test
-	public void currentLineNumberShouldBeReturned() {
+	public void currentLineNumberShouldBeReturned(@ArquillianResource Asciidoctor asciidoctor) {
 
-		JavaExtensionRegistry javaExtensionRegistry = asciidoctor
+        JavaExtensionRegistry javaExtensionRegistry = asciidoctor
 				.javaExtensionRegistry();
 
 		javaExtensionRegistry.preprocessor(NumberLinesPreprocessor.class);
@@ -35,7 +36,7 @@ public class WhenReaderIsManipulatedInExtension {
 	}
 
 	@Test
-	public void hasMoreLinesShouldBeReturned() {
+	public void hasMoreLinesShouldBeReturned(@ArquillianResource Asciidoctor asciidoctor) {
 
 		JavaExtensionRegistry javaExtensionRegistry = asciidoctor
 				.javaExtensionRegistry();
@@ -54,7 +55,7 @@ public class WhenReaderIsManipulatedInExtension {
 	}
 	
 	@Test
-	public void isNextLineEmptyShouldBeReturned() {
+	public void isNextLineEmptyShouldBeReturned(@ArquillianResource Asciidoctor asciidoctor) {
 
 		JavaExtensionRegistry javaExtensionRegistry = asciidoctor
 				.javaExtensionRegistry();

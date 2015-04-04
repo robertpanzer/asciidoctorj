@@ -1,25 +1,25 @@
 package org.asciidoctor;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.hamcrest.CoreMatchers.nullValue;
-import static org.hamcrest.CoreMatchers.startsWith;
-import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
-import static org.junit.Assert.assertThat;
+import org.asciidoctor.ast.ContentPart;
+import org.asciidoctor.ast.DocumentHeader;
+import org.asciidoctor.ast.StructuredDocument;
+import org.asciidoctor.util.ClasspathResources;
+import org.jboss.arquillian.junit.Arquillian;
+import org.jboss.arquillian.test.api.ArquillianResource;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
+import org.junit.runner.RunWith;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.asciidoctor.ast.ContentPart;
-import org.asciidoctor.ast.DocumentHeader;
-import org.asciidoctor.ast.StructuredDocument;
-import org.asciidoctor.internal.JRubyAsciidoctor;
-import org.asciidoctor.util.ClasspathResources;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import static org.hamcrest.CoreMatchers.*;
+import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
+import static org.junit.Assert.assertThat;
 
+@RunWith(Arquillian.class)
 public class WhenStructuredDocumentIsRequired {
 
     @Rule
@@ -28,11 +28,8 @@ public class WhenStructuredDocumentIsRequired {
 	@Rule
 	public TemporaryFolder testFolder = new TemporaryFolder();
 
-	private Asciidoctor asciidoctor = JRubyAsciidoctor.create();
-
 	@Test
-	public void empty_parent_title_makes_subsection_be_null_when_is_parsed() {
-
+	public void empty_parent_title_makes_subsection_be_null_when_is_parsed(@ArquillianResource Asciidoctor asciidoctor) {
 		String s = "= My page\n" + "\n" + "== Totally ignored header\n" + "\n"
 				+ "What does it mean?\n";
 
@@ -50,8 +47,7 @@ public class WhenStructuredDocumentIsRequired {
 	}
 
 	@Test
-	public void structural_content_should_be_retrieved_from_file() {
-
+	public void structural_content_should_be_retrieved_from_file(@ArquillianResource Asciidoctor asciidoctor) {
 		Map<String, Object> parameters = new HashMap<String, Object>();
 		parameters.put(Asciidoctor.STRUCTURE_MAX_LEVEL, 2);
 		StructuredDocument document = asciidoctor.readDocumentStructure(
@@ -107,7 +103,7 @@ public class WhenStructuredDocumentIsRequired {
 	}
 
 	@Test
-	public void some_real_content() {
+	public void some_real_content(@ArquillianResource Asciidoctor asciidoctor) {
 		StructuredDocument document = asciidoctor.readDocumentStructure(
 				classpath.getResource("contentstructure.asciidoc"),
 				new HashMap<String, Object>());
@@ -143,9 +139,8 @@ public class WhenStructuredDocumentIsRequired {
 	}
 
 	@Test
-	public void title_should_be_retrieved_from_simple_string() {
-
-		StructuredDocument document = asciidoctor.readDocumentStructure(
+	public void title_should_be_retrieved_from_simple_string(@ArquillianResource Asciidoctor asciidoctor) {
+        StructuredDocument document = asciidoctor.readDocumentStructure(
 				"= Sample Document", new HashMap<String, Object>());
 
 		DocumentHeader header = document.getHeader();
@@ -160,8 +155,7 @@ public class WhenStructuredDocumentIsRequired {
 	}
 
 	@Test
-	public void one_part_should_be_retrieved_from_simple_string() {
-
+	public void one_part_should_be_retrieved_from_simple_string(@ArquillianResource Asciidoctor asciidoctor) {
 		StructuredDocument document = asciidoctor.readDocumentStructure(
 				"Simple single paragraph", new HashMap<String, Object>());
 
@@ -178,8 +172,7 @@ public class WhenStructuredDocumentIsRequired {
 	}
 
 	@Test
-	public void no_parts_should_be_retrieved_from_empty_string() {
-
+	public void no_parts_should_be_retrieved_from_empty_string(@ArquillianResource Asciidoctor asciidoctor) {
 		StructuredDocument document = asciidoctor.readDocumentStructure("",
 				new HashMap<String, Object>());
 

@@ -15,6 +15,12 @@ public class ArrowsAndBoxesBlock extends BlockProcessor {
 //        config.put("content_model", ":simple");
 //    }
 
+    public ArrowsAndBoxesBlock(String name, Map<String, Object> options) {
+        super(name, options);
+        getConfig().put("contexts", Arrays.asList(":open", ":paragraph"));
+        //getConfig().put("content_model", ":simple");
+    }
+
     public ArrowsAndBoxesBlock(String context, DocumentRuby documentRuby) {
         //super(context, documentRuby);
         super(null, null);

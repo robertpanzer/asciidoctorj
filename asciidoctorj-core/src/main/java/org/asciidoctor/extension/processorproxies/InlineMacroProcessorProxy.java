@@ -81,10 +81,9 @@ public class InlineMacroProcessorProxy extends AbstractMacroProcessorProxy<Inlin
             // instead of those passed by asciidoctor
 
             // If options contains a String with a Regexp create the RubyRegexp from it
-            RubySymbol regexpSymbol = RubySymbol.newSymbol(getRuntime(), "regexp");
-            Object regexp = getProcessor().getConfig().get(regexpSymbol);
+            Object regexp = getProcessor().getConfig().get(":regexp");
             if (regexp != null && regexp instanceof String) {
-                getProcessor().getConfig().put(regexpSymbol, convertRegexp(regexp));
+                getProcessor().getConfig().put(":regexp", convertRegexp(regexp));
             }
 
             Helpers.invokeSuper(

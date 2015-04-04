@@ -7,6 +7,17 @@ task testJar(type: Jar, dependsOn: testClasses) {
 
 configurations {
     tests
+    tests.extendsFrom(testCompile)
+}
+
+dependencies {
+    testCompile "org.jboss.arquillian.container:arquillian-container-spi:$arquillianVersion"
+    testCompile "org.jboss.arquillian.container:arquillian-container-test-spi:$arquillianVersion"
+    testCompile "org.jboss.arquillian.container:arquillian-container-impl-base:$arquillianVersion"
+    testCompile "org.jboss.arquillian.container:arquillian-container-test-impl-base:$arquillianVersion"
+    testCompile "org.jboss.arquillian.junit:arquillian-junit-container:$arquillianVersion"
+    testCompile "junit:junit:$junitVersion"
+    testCompile project(':asciidoctorj-api')
 }
 
 artifacts {

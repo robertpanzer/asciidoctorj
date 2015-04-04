@@ -1,6 +1,5 @@
 package org.asciidoctor.extension;
 
-import org.asciidoctor.ast.Document;
 import org.asciidoctor.ast.DocumentRuby;
 
 import java.util.HashMap;

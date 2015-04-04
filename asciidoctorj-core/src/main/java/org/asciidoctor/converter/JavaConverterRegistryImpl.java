@@ -6,23 +6,22 @@ import org.jruby.RubyArray;
 import org.jruby.RubyClass;
 import org.jruby.RubyModule;
 import org.jruby.RubyString;
-import org.jruby.runtime.ObjectAllocator;
-import org.jruby.runtime.builtin.IRubyObject;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class JavaConverterRegistry {
+public class JavaConverterRegistryImpl implements JavaConverterRegistry {
 
     private AsciidoctorModule asciidoctorModule;
     private Ruby rubyRuntime;
 
-    public JavaConverterRegistry(AsciidoctorModule asciidoctorModule, Ruby rubyRuntime) {
+    public JavaConverterRegistryImpl(AsciidoctorModule asciidoctorModule, Ruby rubyRuntime) {
         super();
         this.asciidoctorModule = asciidoctorModule;
         this.rubyRuntime = rubyRuntime;
     }
 
+    @Override
     public void register(final Class<? extends Converter> converterClass, String... backends) {
         RubyModule module = rubyRuntime.defineModule(getModuleName(converterClass));
         RubyClass clazz = module.defineClassUnder(
@@ -47,6 +46,7 @@ public class JavaConverterRegistry {
         return sb.toString();
     }
 
+    @Override
     public Class<?> resolve(String backend) {
         RubyClass rubyClass = this.asciidoctorModule.resolve_converter(backend);
         Class<?> clazz = rubyClass.getReifiedClass();
@@ -59,10 +59,12 @@ public class JavaConverterRegistry {
         return null;
     }
 
+    @Override
     public void unregisterAll() {
         this.asciidoctorModule.unregister_all_converters();
     }
 
+    @Override
     public Map<String, Class<?>> converters() {
         RubyArray rubyKeys = this.asciidoctorModule.converters();
 

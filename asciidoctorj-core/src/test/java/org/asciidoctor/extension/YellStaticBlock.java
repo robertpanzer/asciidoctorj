@@ -31,7 +31,7 @@ public class YellStaticBlock extends BlockProcessor {
             }
         }
 
-		return createBlock(parent, "paragraph", Arrays.asList(upperLines), attributes, new HashMap<Object, Object>());
+		return createBlock(parent, "paragraph", Arrays.asList(upperLines), attributes, new HashMap<String, Object>());
     }
 
 }

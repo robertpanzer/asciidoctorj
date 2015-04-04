@@ -47,7 +47,7 @@ public class AbstractProcessorProxy<T extends Processor> extends RubyObject {
 
     @JRubyMethod(name = "config")
     public IRubyObject getConfig(ThreadContext context) {
-        return RubyHashUtil.convertMapToRubyHashWithSymbolsIfNecessary(getRuntime(), getProcessor().getConfig());
+        return RubyHashUtil.convertMapToRubyHashWithSymbols(getRuntime(), getProcessor().getConfig());
     }
 
     @JRubyMethod(name = "config=", required = 1)
@@ -58,9 +58,10 @@ public class AbstractProcessorProxy<T extends Processor> extends RubyObject {
 
     @JRubyMethod(name = "update_config", required = 1)
     public IRubyObject updateConfig(ThreadContext context, IRubyObject additionalConfig) {
-        Map additionalJavaConfig = RubyUtils.rubyToJava(getRuntime(), additionalConfig, Map.class);
+        Map additionalJavaConfig = RubyHashUtil.convertRubyHashMapToStringObjectMap(
+                RubyUtils.rubyToJava(getRuntime(), additionalConfig, Map.class));
         processor.update_config(additionalJavaConfig);
-        return RubyHashUtil.convertMapToRubyHashWithSymbolsIfNecessary(getRuntime(), processor.getConfig());
+        return RubyHashUtil.convertMapToRubyHashWithSymbols(getRuntime(), processor.getConfig());
     }
 
 }

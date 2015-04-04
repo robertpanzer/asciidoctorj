@@ -1,21 +1,24 @@
 package org.asciidoctor;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
-import static org.junit.Assert.assertThat;
+import org.asciidoctor.ast.Author;
+import org.asciidoctor.ast.DocumentHeader;
+import org.asciidoctor.ast.RevisionInfo;
+import org.asciidoctor.util.ClasspathResources;
+import org.jboss.arquillian.junit.Arquillian;
+import org.jboss.arquillian.test.api.ArquillianResource;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
+import org.junit.runner.RunWith;
 
 import java.util.List;
 import java.util.Map;
 
-import org.asciidoctor.ast.Author;
-import org.asciidoctor.ast.DocumentHeader;
-import org.asciidoctor.ast.RevisionInfo;
-import org.asciidoctor.internal.JRubyAsciidoctor;
-import org.asciidoctor.util.ClasspathResources;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
+import static org.junit.Assert.assertThat;
 
+@RunWith(Arquillian.class)
 public class WhenDocumentHeaderIsRequired {
 
     @Rule
@@ -24,14 +27,10 @@ public class WhenDocumentHeaderIsRequired {
 	@Rule
     public TemporaryFolder testFolder = new TemporaryFolder();
 	
-	private Asciidoctor asciidoctor = JRubyAsciidoctor.create();
-	
 	@Test
-	public void doctitle_blocks_and_attributes_should_be_returned() {
-		
-		DocumentHeader header = asciidoctor.readDocumentHeader(classpath.getResource("documentheaders.asciidoc"));
-		
-		
+	public void doctitle_blocks_and_attributes_should_be_returned(@ArquillianResource Asciidoctor asciidoctor) {
+        DocumentHeader header = asciidoctor.readDocumentHeader(classpath.getResource("documentheaders.asciidoc"));
+
 		assertThat(header.getDocumentTitle().getMain(), is("Sample Document"));
 		assertThat(header.getPageTitle(), is("Sample Document"));
 		
@@ -48,10 +47,9 @@ public class WhenDocumentHeaderIsRequired {
 	}
 	
 	@Test
-	public void author_info_should_be_bound_into_author_class() {
-		
-		DocumentHeader header = asciidoctor.readDocumentHeader(classpath.getResource("documentheaders.asciidoc"));
-		
+	public void author_info_should_be_bound_into_author_class(@ArquillianResource Asciidoctor asciidoctor) {
+        DocumentHeader header = asciidoctor.readDocumentHeader(classpath.getResource("documentheaders.asciidoc"));
+
 		Author author = header.getAuthor();
 		assertThat(author.getEmail(), is("doc.writer@asciidoc.org"));
 		assertThat(author.getFullName(), is("Doc Writer"));
@@ -62,10 +60,9 @@ public class WhenDocumentHeaderIsRequired {
 	}
 	
 	@Test
-	public void revision_info_should_be_bound_into_revision_info_class() {
-		
-		DocumentHeader header = asciidoctor.readDocumentHeader(classpath.getResource("documentheaders.asciidoc"));
-		
+	public void revision_info_should_be_bound_into_revision_info_class(@ArquillianResource Asciidoctor asciidoctor) {
+        DocumentHeader header = asciidoctor.readDocumentHeader(classpath.getResource("documentheaders.asciidoc"));
+
 		RevisionInfo revisionInfo = header.getRevisionInfo();
 		
 		assertThat(revisionInfo.getDate(), is("2013-05-20"));
@@ -76,10 +73,9 @@ public class WhenDocumentHeaderIsRequired {
 	
 	
 	@Test
-	public void multiple_authors_should_be_bound_into_list_of_authors() {
-		
-		DocumentHeader header = asciidoctor.readDocumentHeader(classpath.getResource("documentheaders.asciidoc"));
-		
+	public void multiple_authors_should_be_bound_into_list_of_authors(@ArquillianResource Asciidoctor asciidoctor) {
+        DocumentHeader header = asciidoctor.readDocumentHeader(classpath.getResource("documentheaders.asciidoc"));
+
 		List<Author> authors = header.getAuthors();
 		assertThat(authors, hasSize(2));
 		

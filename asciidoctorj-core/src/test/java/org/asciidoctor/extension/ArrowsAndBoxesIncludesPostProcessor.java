@@ -5,7 +5,13 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
+import java.util.Map;
+
 public class ArrowsAndBoxesIncludesPostProcessor extends Postprocessor {
+
+    public ArrowsAndBoxesIncludesPostProcessor(Map<String, Object> config) {
+        super(config);
+    }
 
     public ArrowsAndBoxesIncludesPostProcessor(DocumentRuby documentRuby) {
         //super(documentRuby);

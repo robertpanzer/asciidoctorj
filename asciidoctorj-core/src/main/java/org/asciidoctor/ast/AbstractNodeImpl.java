@@ -201,4 +201,8 @@ public abstract class AbstractNodeImpl implements AbstractNode {
     public String listMarkerKeyword(String listType) {
         return abstractNode.listMarkerKeyword(listType);
     }
+
+    Ruby getRuntime() {
+        return runtime;
+    }
 }

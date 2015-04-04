@@ -1,6 +1,7 @@
 dependencies {
   compile "org.jruby:jruby-complete:$jrubyVersion"
   compile "com.beust:jcommander:$jcommanderVersion"
+  compile project(':asciidoctorj-api')
   gems "rubygems:asciidoctor:$asciidoctorGemVersion"
   gems "rubygems:coderay:$coderayGemVersion"
   gems "rubygems:erubis:$erubisGemVersion"

@@ -1,18 +1,23 @@
 package org.asciidoctor;
 
-import static org.asciidoctor.AttributesBuilder.attributes;
-import static org.asciidoctor.OptionsBuilder.options;
-import static org.hamcrest.CoreMatchers.containsString;
-import static org.hamcrest.CoreMatchers.instanceOf;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.not;
-import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.hamcrest.CoreMatchers.nullValue;
-import static org.hamcrest.CoreMatchers.startsWith;
-import static org.hamcrest.collection.IsArrayContaining.hasItemInArray;
-import static org.junit.Assert.assertThat;
-import static org.xmlmatchers.xpath.HasXPath.hasXPath;
+import com.google.common.io.CharStreams;
+import org.asciidoctor.util.ClasspathResources;
+import org.jboss.arquillian.junit.Arquillian;
+import org.jboss.arquillian.test.api.ArquillianResource;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
+import org.junit.runner.RunWith;
+import org.xml.sax.SAXException;
 
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.Source;
+import javax.xml.transform.dom.DOMSource;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -24,24 +29,14 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Map;
 
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.Source;
-import javax.xml.transform.dom.DOMSource;
+import static org.asciidoctor.AttributesBuilder.attributes;
+import static org.asciidoctor.OptionsBuilder.options;
+import static org.hamcrest.CoreMatchers.*;
+import static org.hamcrest.collection.IsArrayContaining.hasItemInArray;
+import static org.junit.Assert.assertThat;
+import static org.xmlmatchers.xpath.HasXPath.hasXPath;
 
-import org.asciidoctor.internal.JRubyAsciidoctor;
-import org.asciidoctor.util.ClasspathResources;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
-import org.xml.sax.SAXException;
-
-import com.google.common.io.CharStreams;
-
+@RunWith(Arquillian.class)
 public class WhenAttributesAreUsedInAsciidoctor {
 
     @Rule
@@ -50,11 +45,8 @@ public class WhenAttributesAreUsedInAsciidoctor {
     @Rule
     public TemporaryFolder testFolder = new TemporaryFolder();
 
-    private Asciidoctor asciidoctor = JRubyAsciidoctor.create();
-
     @Test
-    public void qualified_http_url_inline_with_hide_uri_scheme_set() throws IOException {
-        
+    public void qualified_http_url_inline_with_hide_uri_scheme_set(@ArquillianResource Asciidoctor asciidoctor) throws IOException {
         Attributes attributes = attributes().hiddenUriScheme(true).get();
         
         String content = asciidoctor.render("The AsciiDoc project is located at http://asciidoc.org.", OptionsBuilder.options().attributes(attributes));
@@ -66,8 +58,7 @@ public class WhenAttributesAreUsedInAsciidoctor {
     }
     
     @Test
-    public void compat_mode_should_change_how_document_is_rendered_to_legacy_system() {
-        
+    public void compat_mode_should_change_how_document_is_rendered_to_legacy_system(@ArquillianResource Asciidoctor asciidoctor) {
         Attributes attributes = attributes().attribute("version", "1.0.0").compatMode(CompatMode.LEGACY).get();
         
         String content = asciidoctor.render("The `AsciiDoc {version}` project.", OptionsBuilder.options().attributes(attributes));
@@ -79,8 +70,7 @@ public class WhenAttributesAreUsedInAsciidoctor {
     }
 
     @Test
-    public void no_compat_mode_should_change_how_document_is_rendered_to_new_system() {
-        
+    public void no_compat_mode_should_change_how_document_is_rendered_to_new_system(@ArquillianResource Asciidoctor asciidoctor) {
         Attributes attributes = attributes().attribute("version", "1.0.0").get();
         
         String content = asciidoctor.render("The `AsciiDoc {version}` project.", OptionsBuilder.options().attributes(attributes));
@@ -92,8 +82,7 @@ public class WhenAttributesAreUsedInAsciidoctor {
     }
 
     @Test
-    public void should_preload_open_cache_uri_gem() throws IOException {
-        
+    public void should_preload_open_cache_uri_gem(@ArquillianResource Asciidoctor asciidoctor) throws IOException {
         Attributes attributes = attributes().cacheUri(true).get();
         
         String content = asciidoctor.render("read my lips", OptionsBuilder.options().attributes(attributes));
@@ -103,8 +92,7 @@ public class WhenAttributesAreUsedInAsciidoctor {
     }
 
     @Test
-    public void should_add_AsciiMath_delimiters_around_math_block_content_if_math_attribute_not_latexmath() throws IOException {
-        
+    public void should_add_AsciiMath_delimiters_around_math_block_content_if_math_attribute_not_latexmath(@ArquillianResource Asciidoctor asciidoctor) throws IOException {
         Attributes attributes = attributes().math("asciimath").get();
         
         Options options = options().inPlace(false).safe(SafeMode.UNSAFE)
@@ -118,8 +106,7 @@ public class WhenAttributesAreUsedInAsciidoctor {
     }
 
     @Test
-    public void should_use_custom_appendix_caption_if_specified() throws IOException {
-        
+    public void should_use_custom_appendix_caption_if_specified(@ArquillianResource Asciidoctor asciidoctor) throws IOException {
         Attributes attributes = attributes().appendixCaption("App").get();
         
         Options options = options().inPlace(false).safe(SafeMode.UNSAFE)
@@ -135,8 +122,7 @@ public class WhenAttributesAreUsedInAsciidoctor {
     }
 
     @Test
-    public void should_add_a_hardbreak_at_end_of_each_line_when_hardbreaks_option_is_set() throws IOException {
-        
+    public void should_add_a_hardbreak_at_end_of_each_line_when_hardbreaks_option_is_set(@ArquillianResource Asciidoctor asciidoctor) throws IOException {
         Attributes attributes = attributes().hardbreaks(true).get();
         
         String content = asciidoctor.render("read\nmy\nlips", OptionsBuilder.options().attributes(attributes));
@@ -148,8 +134,7 @@ public class WhenAttributesAreUsedInAsciidoctor {
     }
     
     @Test
-    public void sect_num_levels_attribute_should_only_number_levels_up_to_value_defined_by_sectnumlevels_attribute() throws IOException {
-        
+    public void sect_num_levels_attribute_should_only_number_levels_up_to_value_defined_by_sectnumlevels_attribute(@ArquillianResource Asciidoctor asciidoctor) throws IOException {
         Attributes attributes = attributes().sectionNumbers(true).sectNumLevels(2).get();
         
         Options options = options().inPlace(false).safe(SafeMode.UNSAFE)
@@ -166,8 +151,7 @@ public class WhenAttributesAreUsedInAsciidoctor {
     }
     
     @Test
-    public void no_footer_attribute_should_not_show_footer_info() throws IOException {
-        
+    public void no_footer_attribute_should_not_show_footer_info(@ArquillianResource Asciidoctor asciidoctor) throws IOException {
         Attributes attributes = attributes().noFooter(true).get();
         
         Options options = options().inPlace(false).safe(SafeMode.UNSAFE)
@@ -182,8 +166,7 @@ public class WhenAttributesAreUsedInAsciidoctor {
     }
     
     @Test
-    public void source_highlighter_attribute_should_add_required_javascript_libraries_as_highlighter() throws IOException {
-        
+    public void source_highlighter_attribute_should_add_required_javascript_libraries_as_highlighter(@ArquillianResource Asciidoctor asciidoctor) throws IOException {
         Attributes attributes = attributes().sourceHighlighter("prettify").get();
         
         Options options = options().inPlace(false).safe(SafeMode.UNSAFE)
@@ -199,8 +182,7 @@ public class WhenAttributesAreUsedInAsciidoctor {
     }
     
     @Test
-    public void render_content_without_attributes_should_embed_css_by_default() throws IOException {
-        
+    public void render_content_without_attributes_should_embed_css_by_default(@ArquillianResource Asciidoctor asciidoctor) throws IOException {
         Options options = options().inPlace(false).safe(SafeMode.UNSAFE)
                 .toDir(testFolder.getRoot()).get();
 
@@ -217,9 +199,8 @@ public class WhenAttributesAreUsedInAsciidoctor {
     }
     
     @Test
-    public void should_skip_front_matter_if_specified_by_skip_front_matter_attribute()
+    public void should_skip_front_matter_if_specified_by_skip_front_matter_attribute(@ArquillianResource Asciidoctor asciidoctor)
             throws IOException {
-
         Attributes attributes = attributes().skipFrontMatter(true).get();
         Options options = options().toFile(false).inPlace(false).attributes(attributes).get();
 
@@ -232,8 +213,7 @@ public class WhenAttributesAreUsedInAsciidoctor {
     }
 
     @Test
-    public void set_anchors_attribute_should_add_anchor_to_sections() {
-
+    public void set_anchors_attribute_should_add_anchor_to_sections(@ArquillianResource Asciidoctor asciidoctor) {
         Attributes attributes = attributes().setAnchors(true).get();
         Options options = options().inPlace(false).toFile(false).attributes(attributes).get();
 
@@ -247,8 +227,7 @@ public class WhenAttributesAreUsedInAsciidoctor {
     }
 
     @Test
-    public void ignore_undefined_attributes_should_keep_lines_with_undefined_attributes() {
-
+    public void ignore_undefined_attributes_should_keep_lines_with_undefined_attributes(@ArquillianResource Asciidoctor asciidoctor) {
         Attributes attributes = attributes().ignoreUndefinedAttributes(true).get();
         Options options = options().toFile(false).attributes(attributes).get();
 
@@ -259,8 +238,7 @@ public class WhenAttributesAreUsedInAsciidoctor {
     }
 
     @Test
-    public void setting_toc_attribute_table_of_contents_should_be_generated() throws IOException {
-
+    public void setting_toc_attribute_table_of_contents_should_be_generated(@ArquillianResource Asciidoctor asciidoctor) throws IOException {
         Attributes attributes = attributes().tableOfContents(true).get();
         Options options = options().inPlace(false).toDir(testFolder.getRoot()).safe(SafeMode.UNSAFE).attributes(attributes).get();
 
@@ -274,8 +252,7 @@ public class WhenAttributesAreUsedInAsciidoctor {
     }
 
     @Test
-    public void attribute_missing_should_drop_line_should_drop_line_with_reference_to_missing_attribute_if_attribute_missing_attribute_is_drop_line() {
-
+    public void attribute_missing_should_drop_line_should_drop_line_with_reference_to_missing_attribute_if_attribute_missing_attribute_is_drop_line(@ArquillianResource Asciidoctor asciidoctor) {
         Attributes attributes = attributes().attributeMissing("drop-line").get();
         Options options = options().attributes(attributes).get();
 
@@ -287,8 +264,7 @@ public class WhenAttributesAreUsedInAsciidoctor {
     }
 
     @Test
-    public void attribute_undefined_should_not_drop_line_with_attribute_unassignment_if_attribute_undefined_is_drop() {
-        
+    public void attribute_undefined_should_not_drop_line_with_attribute_unassignment_if_attribute_undefined_is_drop(@ArquillianResource Asciidoctor asciidoctor) {
         Attributes attributes = attributes().attributeUndefined("drop").get();
         Options options = options().attributes(attributes).get();
         
@@ -300,8 +276,7 @@ public class WhenAttributesAreUsedInAsciidoctor {
     }
     
     @Test
-    public void table_of_content_should_be_placeable() throws IOException {
-
+    public void table_of_content_should_be_placeable(@ArquillianResource Asciidoctor asciidoctor) throws IOException {
         Attributes attributes = attributes().tableOfContents(Placement.RIGHT).get();
         Options options = options().inPlace(false)
                 .toFile(new File(testFolder.getRoot(), "toc2sample.html"))
@@ -321,8 +296,7 @@ public class WhenAttributesAreUsedInAsciidoctor {
     }
 
     @Test
-    public void table_of_content_2_should_be_placeable() throws IOException {
-
+    public void table_of_content_2_should_be_placeable(@ArquillianResource Asciidoctor asciidoctor) throws IOException {
         Attributes attributes = attributes().tableOfContents2(Placement.RIGHT).get();
         Options options = options().inPlace(false)
                 .toFile(new File(testFolder.getRoot(), "toc2sample.html"))
@@ -342,8 +316,7 @@ public class WhenAttributesAreUsedInAsciidoctor {
     }
 
     @Test
-    public void setting_linkcss_as_false_in_string_should_embed_css_file() throws IOException {
-
+    public void setting_linkcss_as_false_in_string_should_embed_css_file(@ArquillianResource Asciidoctor asciidoctor) throws IOException {
     	Attributes attributes = attributes("linkcss!").get();
         Options options = options().inPlace(false).safe(SafeMode.UNSAFE)
                 .toDir(testFolder.getRoot()).attributes(attributes).get();
@@ -364,8 +337,7 @@ public class WhenAttributesAreUsedInAsciidoctor {
     }
     
     @Test
-    public void setting_toc_attribute_and_numbered_in_string_form_table_of_contents_should_be_generated() throws IOException {
-
+    public void setting_toc_attribute_and_numbered_in_string_form_table_of_contents_should_be_generated(@ArquillianResource Asciidoctor asciidoctor) throws IOException {
         Attributes attributes = attributes("toc numbered").get();
         Options options = options().inPlace(false).toDir(testFolder.getRoot()).safe(SafeMode.UNSAFE).attributes(attributes).get();
 
@@ -381,8 +353,7 @@ public class WhenAttributesAreUsedInAsciidoctor {
     }
 
     @Test
-    public void setting_toc_attribute_and_numbered_in_array_form_table_of_contents_should_be_generated() throws IOException {
-
+    public void setting_toc_attribute_and_numbered_in_array_form_table_of_contents_should_be_generated(@ArquillianResource Asciidoctor asciidoctor) throws IOException {
         Attributes attributes = attributes(new String[] { "toc", "numbered" })
                 .get();
         Options options = options().inPlace(false).toDir(testFolder.getRoot()).safe(SafeMode.UNSAFE).attributes(attributes).get();
@@ -399,8 +370,7 @@ public class WhenAttributesAreUsedInAsciidoctor {
     }
 
     @Test
-    public void unsetting_toc_attribute_table_of_contents_should_not_be_generated() {
-
+    public void unsetting_toc_attribute_table_of_contents_should_not_be_generated(@ArquillianResource Asciidoctor asciidoctor) {
         Attributes attributes = attributes().tableOfContents(false).get();
         Options options = options().toFile(false).attributes(attributes).get();
 
@@ -414,9 +384,8 @@ public class WhenAttributesAreUsedInAsciidoctor {
     }
 
     @Test
-    public void styleSheetName_is_set_custom_stylesheet_should_be_used_()
+    public void styleSheetName_is_set_custom_stylesheet_should_be_used_(@ArquillianResource Asciidoctor asciidoctor)
             throws IOException {
-
         Attributes attributes = attributes().linkCss(true)
                 .styleSheetName("mycustom.css").get();
         Options options = options().inPlace(false).safe(SafeMode.UNSAFE)
@@ -434,9 +403,8 @@ public class WhenAttributesAreUsedInAsciidoctor {
     }
 
     @Test
-    public void unsetting_styleSheetName_should_leave_document_without_style()
+    public void unsetting_styleSheetName_should_leave_document_without_style(@ArquillianResource Asciidoctor asciidoctor)
             throws IOException {
-
         Attributes attributes = attributes().unsetStyleSheet().get();
         Options options = options().inPlace(false).safe(SafeMode.UNSAFE)
                 .toDir(testFolder.getRoot()).attributes(attributes).get();
@@ -452,8 +420,7 @@ public class WhenAttributesAreUsedInAsciidoctor {
     }
 
     @Test
-    public void styles_dir_is_set_css_routes_should_use_it() throws IOException {
-
+    public void styles_dir_is_set_css_routes_should_use_it(@ArquillianResource Asciidoctor asciidoctor) throws IOException {
         Attributes attributes = attributes().stylesDir("./styles")
                 .linkCss(true).styleSheetName("mycustom.css").get();
         Options options = options().inPlace(false).safe(SafeMode.UNSAFE)
@@ -470,8 +437,7 @@ public class WhenAttributesAreUsedInAsciidoctor {
     }
 
     @Test
-    public void unsetting_linkcss_should_embed_css_file() throws IOException {
-
+    public void unsetting_linkcss_should_embed_css_file(@ArquillianResource Asciidoctor asciidoctor) throws IOException {
         Attributes attributes = attributes().linkCss(false).get();
         Options options = options().inPlace(false).safe(SafeMode.UNSAFE)
                 .toDir(testFolder.getRoot()).attributes(attributes).get();
@@ -492,8 +458,7 @@ public class WhenAttributesAreUsedInAsciidoctor {
     }
 
     @Test
-    public void linkcss_should_not_embed_css_file() throws IOException {
-
+    public void linkcss_should_not_embed_css_file(@ArquillianResource Asciidoctor asciidoctor) throws IOException {
         Attributes attributes = attributes().linkCss(true).get();
         Options options = options().inPlace(false).safe(SafeMode.UNSAFE)
                 .toDir(testFolder.getRoot()).attributes(attributes).get();
@@ -509,7 +474,7 @@ public class WhenAttributesAreUsedInAsciidoctor {
     }
 
     @Test
-    public void copycss_with_in_place_should_copy_css_to_rendered_directory() {
+    public void copycss_with_in_place_should_copy_css_to_rendered_directory(@ArquillianResource Asciidoctor asciidoctor) {
         Attributes attributes = attributes().linkCss(true).copyCss(true).get();
         Options options = options().inPlace(true).safe(SafeMode.UNSAFE)
                 .attributes(attributes).get();
@@ -524,7 +489,7 @@ public class WhenAttributesAreUsedInAsciidoctor {
     }
 
     @Test
-    public void copycss_negated_with_in_place_should_not_copy_css_to_rendered_directory() {
+    public void copycss_negated_with_in_place_should_not_copy_css_to_rendered_directory(@ArquillianResource Asciidoctor asciidoctor) {
         Attributes attributes = attributes().copyCss(false).get();
         Options options = options().inPlace(true).safe(SafeMode.UNSAFE)
                 .attributes(attributes).get();
@@ -542,8 +507,7 @@ public class WhenAttributesAreUsedInAsciidoctor {
     }
 
     @Test
-    public void copycss_and_linkcss_negated_should_not_copy_css_to_rendered_file() {
-
+    public void copycss_and_linkcss_negated_should_not_copy_css_to_rendered_file(@ArquillianResource Asciidoctor asciidoctor) {
         Attributes attributes = attributes().copyCss(true).linkCss(false).get();
         Options options = options().inPlace(true).safe(SafeMode.UNSAFE)
                 .attributes(attributes).get();
@@ -561,8 +525,7 @@ public class WhenAttributesAreUsedInAsciidoctor {
     }
 
     @Test
-    public void copycss_with_to_file_should_copy_css_to_to_file_directory() {
-
+    public void copycss_with_to_file_should_copy_css_to_to_file_directory(@ArquillianResource Asciidoctor asciidoctor) {
         Attributes attributes = attributes().linkCss(true).copyCss(true).get();
         Options options = options().inPlace(false)
                 .toFile(new File(testFolder.getRoot(), "output.html"))
@@ -576,8 +539,7 @@ public class WhenAttributesAreUsedInAsciidoctor {
     }
 
     @Test
-    public void copycss_with_to_dir_should_copy_css_to_to_dir_directory() {
-
+    public void copycss_with_to_dir_should_copy_css_to_to_dir_directory(@ArquillianResource Asciidoctor asciidoctor) {
         Attributes attributes = attributes().linkCss(true).copyCss(true).get();
         Options options = options().inPlace(false).toDir(testFolder.getRoot())
                 .safe(SafeMode.UNSAFE).attributes(attributes).get();
@@ -590,8 +552,7 @@ public class WhenAttributesAreUsedInAsciidoctor {
     }
 
     @Test
-    public void copycss_with_render_to_file_should_copy_css_to_to_file_directory() {
-
+    public void copycss_with_render_to_file_should_copy_css_to_to_file_directory(@ArquillianResource Asciidoctor asciidoctor) {
         Attributes attributes = attributes().linkCss(true).copyCss(true).get();
         Options options = options().inPlace(false)
                 .toFile(new File(testFolder.getRoot(), "output.html"))
@@ -605,8 +566,7 @@ public class WhenAttributesAreUsedInAsciidoctor {
     }
 
     @Test
-    public void copycss_with_render_to_dir_should_copy_css_to_to_dir_directory() {
-
+    public void copycss_with_render_to_dir_should_copy_css_to_to_dir_directory(@ArquillianResource Asciidoctor asciidoctor) {
         Attributes attributes = attributes().linkCss(true).copyCss(true).get();
         Options options = options().inPlace(false).toDir(testFolder.getRoot())
                 .safe(SafeMode.UNSAFE).attributes(attributes).get();
@@ -619,9 +579,8 @@ public class WhenAttributesAreUsedInAsciidoctor {
     }
 
     @Test
-    public void string_content_with_icons_enabled_should_be_rendered()
+    public void string_content_with_icons_enabled_should_be_rendered(@ArquillianResource Asciidoctor asciidoctor)
             throws IOException, SAXException, ParserConfigurationException {
-
         InputStream content = new FileInputStream(
                 classpath.getResource("documentwithnote.asciidoc"));
 
@@ -636,9 +595,8 @@ public class WhenAttributesAreUsedInAsciidoctor {
     }
 
     @Test
-    public void string_content_with_fontawesome_icons_enabled_should_be_rendered()
+    public void string_content_with_fontawesome_icons_enabled_should_be_rendered(@ArquillianResource Asciidoctor asciidoctor)
             throws IOException, SAXException, ParserConfigurationException {
-
         InputStream content = new FileInputStream(
                 classpath.getResource("documentwithnote.asciidoc"));
 
@@ -652,9 +610,8 @@ public class WhenAttributesAreUsedInAsciidoctor {
     }
 
     @Test
-    public void string_content_with_icons_enabled_and_iconsdir_set_should_be_rendered_with_iconsdir()
+    public void string_content_with_icons_enabled_and_iconsdir_set_should_be_rendered_with_iconsdir(@ArquillianResource Asciidoctor asciidoctor)
             throws IOException, SAXException, ParserConfigurationException {
-
         InputStream content = new FileInputStream(
                 classpath.getResource("documentwithnote.asciidoc"));
 
@@ -672,8 +629,7 @@ public class WhenAttributesAreUsedInAsciidoctor {
     }
 
     @Test
-    public void linkattrs_should_make_asciidoctor_render_link_macro_attributes() {
-
+    public void linkattrs_should_make_asciidoctor_render_link_macro_attributes(@ArquillianResource Asciidoctor asciidoctor) {
         Attributes attributes = attributes().linkAttrs(true).get();
         Options options = options().attributes(attributes).get();
 
@@ -689,8 +645,7 @@ public class WhenAttributesAreUsedInAsciidoctor {
     }
 
     @Test
-    public void experimental_flag_should_enable_experimental_features_like_keyboard_shortcuts() {
-
+    public void experimental_flag_should_enable_experimental_features_like_keyboard_shortcuts(@ArquillianResource Asciidoctor asciidoctor) {
         Attributes attributes = attributes().experimental(true).get();
         Options options = options().attributes(attributes).get();
 
@@ -703,9 +658,8 @@ public class WhenAttributesAreUsedInAsciidoctor {
     }
 
     @Test
-    public void iconfont_attributes_should_be_used_for_using_custom_font_css_icons()
+    public void iconfont_attributes_should_be_used_for_using_custom_font_css_icons(@ArquillianResource Asciidoctor asciidoctor)
             throws URISyntaxException, IOException {
-
         Attributes attributes = attributes().icons(Attributes.FONT_ICONS)
                 .iconFontRemote(true).iconFontCdn(new URI("http://mycdn/css/font-awesome.min.css")).get();
         Options options = options().inPlace(true).attributes(attributes).get();

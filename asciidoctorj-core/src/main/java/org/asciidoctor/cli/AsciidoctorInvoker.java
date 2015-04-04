@@ -1,22 +1,19 @@
 package org.asciidoctor.cli;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Scanner;
-
+import com.beust.jcommander.JCommander;
 import org.asciidoctor.Asciidoctor;
 import org.asciidoctor.DirectoryWalker;
 import org.asciidoctor.GlobDirectoryWalker;
 import org.asciidoctor.Options;
 import org.asciidoctor.internal.JRubyAsciidoctor;
-import org.asciidoctor.internal.JRubyRuntimeContext;
 import org.asciidoctor.internal.RubyHashUtil;
 import org.asciidoctor.internal.RubyUtils;
-import org.jruby.RubySymbol;
 
-import com.beust.jcommander.JCommander;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Scanner;
 
 public class AsciidoctorInvoker {
 
@@ -31,9 +28,7 @@ public class AsciidoctorInvoker {
             jCommander.usage();
         } else {
 
-            Asciidoctor asciidoctor = null;
-            
-            asciidoctor = buildAsciidoctorJInstance(asciidoctorCliOptions);
+            JRubyAsciidoctor asciidoctor = buildAsciidoctorJInstance(asciidoctorCliOptions);
             
             if (asciidoctorCliOptions.isVersion()) {
                 System.out.println("Asciidoctor " + asciidoctor.asciidoctorVersion() + " [http://asciidoctor.org]");
@@ -56,11 +51,11 @@ public class AsciidoctorInvoker {
             
             if(asciidoctorCliOptions.isRequire()) {
                 for (String require : asciidoctorCliOptions.getRequire()) {
-                    RubyUtils.requireLibrary(JRubyRuntimeContext.get(), require);
+                    RubyUtils.requireLibrary(asciidoctor.getRubyRuntime(), require);
                 }
             }
             
-            setVerboseLevel(asciidoctorCliOptions);
+            setVerboseLevel(asciidoctor, asciidoctorCliOptions);
             
             String output = renderInput(asciidoctor, options, inputFiles);
 
@@ -89,18 +84,18 @@ public class AsciidoctorInvoker {
         }
     }
 
-    private void setVerboseLevel(AsciidoctorCliOptions asciidoctorCliOptions) {
+    private void setVerboseLevel(JRubyAsciidoctor asciidoctor, AsciidoctorCliOptions asciidoctorCliOptions) {
         if(asciidoctorCliOptions.isVerbose()) {
-            RubyUtils.setGlobalVariable(JRubyRuntimeContext.get(), "VERBOSE", "true");
+            RubyUtils.setGlobalVariable(asciidoctor.getRubyRuntime(), "VERBOSE", "true");
         } else {
             if(asciidoctorCliOptions.isQuiet()) {
-                RubyUtils.setGlobalVariable(JRubyRuntimeContext.get(), "VERBOSE", "nil");
+                RubyUtils.setGlobalVariable(asciidoctor.getRubyRuntime(), "VERBOSE", "nil");
             }
         }
     }
 
-    private Asciidoctor buildAsciidoctorJInstance(AsciidoctorCliOptions asciidoctorCliOptions) {
-        Asciidoctor asciidoctor;
+    private JRubyAsciidoctor buildAsciidoctorJInstance(AsciidoctorCliOptions asciidoctorCliOptions) {
+        JRubyAsciidoctor asciidoctor;
         if(asciidoctorCliOptions.isLoadPaths()) {
          asciidoctor = JRubyAsciidoctor.create(asciidoctorCliOptions.getLoadPaths());   
         } else {

@@ -1,10 +1,9 @@
 package org.asciidoctor.extension;
 
+import org.asciidoctor.ast.DocumentRuby;
+
 import java.util.HashMap;
 import java.util.Map;
-
-import org.asciidoctor.ast.Document;
-import org.asciidoctor.ast.DocumentRuby;
 
 public abstract class Postprocessor extends Processor {
 
