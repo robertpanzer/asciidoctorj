@@ -85,7 +85,7 @@ public class AsciidoctorTestObserver {
         for (Field f: SecurityActions.getFieldsWithAnnotation(testClass, ArquillianResource.class)) {
             ArquillianResource arquillianResource = SecurityActions.getAnnotation(f, ArquillianResource.class);
             if (f.getType() == Asciidoctor.class &&
-                    (arquillianResource == null || arquillianResource.value() == Unshared.class)) {
+                    (arquillianResource.value() == ArquillianResource.class || arquillianResource.value() == Unshared.class)) {
                 return true;
             }
         }
