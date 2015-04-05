@@ -17,8 +17,8 @@ import static org.junit.Assert.assertThat;
 @RunWith(Arquillian.class)
 public class WhenReaderIsManipulatedInExtension {
 
-    @Rule
-    public ClasspathResources classpath = new ClasspathResources();
+    @ArquillianResource
+    public ClasspathResources classpath;
 
 	@Test
 	public void currentLineNumberShouldBeReturned(@ArquillianResource Asciidoctor asciidoctor) {

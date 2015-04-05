@@ -18,8 +18,8 @@ import static org.junit.Assert.assertThat;
 @RunWith(Arquillian.class)
 public class WhenRubyExtensionIsRegistered {
 
-    @Rule
-    public ClasspathResources classpath = new ClasspathResources();
+    @ArquillianResource
+    public ClasspathResources classpath;
 
     @Test
     public void ruby_extension_should_be_registered(@ArquillianResource Asciidoctor asciidoctor) {

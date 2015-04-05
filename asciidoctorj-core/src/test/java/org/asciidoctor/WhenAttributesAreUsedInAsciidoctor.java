@@ -39,8 +39,8 @@ import static org.xmlmatchers.xpath.HasXPath.hasXPath;
 @RunWith(Arquillian.class)
 public class WhenAttributesAreUsedInAsciidoctor {
 
-    @Rule
-    public ClasspathResources classpath = new ClasspathResources();
+    @ArquillianResource
+    public ClasspathResources classpath;
 
     @Rule
     public TemporaryFolder testFolder = new TemporaryFolder();

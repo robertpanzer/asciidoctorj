@@ -18,8 +18,8 @@ import org.junit.runner.RunWith;
 @RunWith(Arquillian.class)
 public class WhenEpub3BackendIsUsed {
 
-    @Rule
-    public ClasspathResources classpath = new ClasspathResources();
+    @ArquillianResource
+    public ClasspathResources classpath;
     
     @Test
     public void epub3_should_be_rendered_for_epub3_backend(@ArquillianResource Asciidoctor asciidoctor) {

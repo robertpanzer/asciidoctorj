@@ -4,11 +4,11 @@ import org.asciidoctor.Asciidoctor;
 import org.asciidoctor.test.arquillian.api.Shared;
 import org.asciidoctor.test.arquillian.api.Unshared;
 import org.asciidoctor.util.AnnotationUtils;
+import org.asciidoctor.util.ClasspathResources;
 import org.jboss.arquillian.core.api.InstanceProducer;
 import org.jboss.arquillian.core.api.annotation.ApplicationScoped;
 import org.jboss.arquillian.core.api.annotation.Inject;
 import org.jboss.arquillian.core.api.annotation.Observes;
-import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.arquillian.test.api.ArquillianResource;
 import org.jboss.arquillian.test.spi.event.suite.After;
 import org.jboss.arquillian.test.spi.event.suite.AfterClass;
@@ -22,7 +22,11 @@ public class AsciidoctorTestObserver {
 
     @Inject @ApplicationScoped
     private InstanceProducer<ScopedAsciidoctor> scopedAsciidoctor;
-    
+
+    @Inject @ApplicationScoped
+    private InstanceProducer<ClasspathResources> classpathResourcesInstanceProducer;
+
+
     public void beforeTestClass(@Observes(precedence = 100) BeforeClass beforeClass) {
         scopedAsciidoctor.set(new ScopedAsciidoctor());
     }
@@ -32,6 +36,11 @@ public class AsciidoctorTestObserver {
             scopedAsciidoctor.get().setSharedAsciidoctor(
                     Asciidoctor.Factory.create());
         }
+    }
+
+    public void beforeTestClassCreateClasspathResources(@Observes BeforeClass beforeClass) {
+        ClasspathResources classpathResources = new ClasspathResources(beforeClass.getTestClass().getJavaClass());
+        classpathResourcesInstanceProducer.set(classpathResources);
     }
 
 

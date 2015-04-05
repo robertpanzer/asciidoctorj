@@ -8,6 +8,7 @@ public class AsciidoctorExtension implements LoadableExtension {
     @Override
     public void register(ExtensionBuilder builder) {
         builder.service(ResourceProvider.class, AsciidoctorResourceProvider.class);
+        builder.service(ResourceProvider.class, ClasspathResourcesResourceProvider.class);
         builder.observer(AsciidoctorTestObserver.class);
     }
 

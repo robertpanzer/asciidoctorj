@@ -1,28 +1,43 @@
 package org.asciidoctor.util;
 
-import org.junit.rules.TestRule;
-import org.junit.runner.Description;
-import org.junit.runners.model.Statement;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.net.URISyntaxException;
+import java.net.URL;
 
 /**
- * JUnit TestRule to handle classpath files.
- * 
- *  Delegates to {@link ClasspathHelper}
+ * Hels getting files from the classpath.
  */
-public class ClasspathResources extends ClasspathHelper implements TestRule {
+public class ClasspathResources {
 
-    protected void before(Class<?> clazz) throws Throwable {
-        super.setClassloader(clazz);
+    private ClassLoader classloader;
+
+    public ClasspathResources(Class<?> clazz) {
+        this.classloader = clazz.getClassLoader();
     }
 
-    @Override
-    public Statement apply(final Statement base, final Description description) {
-        return new Statement() {
-            @Override
-            public void evaluate() throws Throwable {
-                before(description.getTestClass());
-                base.evaluate();
+    /**
+     * Gets a resourse in a similar way as {@link File#File(String)} 
+     */
+    public File getResource(String pathname) {
+        try {
+            URL resource = classloader.getResource(pathname);
+            if (resource != null) {
+                return new File(classloader.getResource(pathname).toURI());
             }
-        };
+            else {
+                throw new RuntimeException(new FileNotFoundException(pathname));
+            }
+        } catch (URISyntaxException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
     }
+
+    /**
+     *  Gets a resourse in a similar way as {@link File#File(String, String)} 
+     */
+    public File getResource(String parent, String child) {
+        return new File(getResource(parent), child);
+    }
+
 }

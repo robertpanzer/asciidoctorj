@@ -15,8 +15,8 @@ import static org.asciidoctor.OptionsBuilder.options;
 @RunWith(Arquillian.class)
 public class WhenAsciidoctorLogsToConsole {
 
-    @Rule
-    public ClasspathResources classpath = new ClasspathResources();
+    @ArquillianResource
+    public ClasspathResources classpath;
 
     @Rule
     public TemporaryFolder testFolder = new TemporaryFolder();

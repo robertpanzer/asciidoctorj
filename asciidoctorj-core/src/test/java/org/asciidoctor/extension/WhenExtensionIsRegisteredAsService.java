@@ -27,8 +27,8 @@ import org.junit.runner.RunWith;
 @RunWith(Arquillian.class)
 public class WhenExtensionIsRegisteredAsService {
 
-    @Rule
-    public ClasspathResources classpath = new ClasspathResources();
+    @ArquillianResource
+    public ClasspathResources classpath;
     
     @Rule
     public TemporaryFolder testFolder = new TemporaryFolder();

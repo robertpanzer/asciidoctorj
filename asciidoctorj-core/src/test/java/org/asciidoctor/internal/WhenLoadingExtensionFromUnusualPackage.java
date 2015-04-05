@@ -13,9 +13,6 @@ import unusual.extension.BoldifyPostProcessor;
 @RunWith(Arquillian.class)
 public class WhenLoadingExtensionFromUnusualPackage {
 
-  @Rule
-  public ClasspathResources classpath = new ClasspathResources();
-
   @Test
   public void shouldAllowLoadingUsingInstance(@ArquillianResource Asciidoctor asciidoctor) {
     final JavaExtensionRegistry registry = asciidoctor.javaExtensionRegistry();

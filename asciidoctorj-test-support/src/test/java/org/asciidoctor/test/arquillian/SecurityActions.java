@@ -331,6 +331,7 @@ final class SecurityActions {
         }
     }
 
+    @SuppressWarnings("unchecked")
     public static <T extends Annotation> T getAnnotation(final Field f, final Class<T> annotationClass) {
         return AccessController.doPrivileged(new PrivilegedAction<T>() {
             @Override

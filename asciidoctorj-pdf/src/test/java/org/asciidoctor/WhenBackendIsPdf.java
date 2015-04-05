@@ -18,8 +18,8 @@ import org.junit.runner.RunWith;
 @RunWith(Arquillian.class)
 public class WhenBackendIsPdf {
 
-    @Rule
-    public ClasspathResources classpath = new ClasspathResources();
+    @ArquillianResource
+    public ClasspathResources classpath;
 
     @Test
     public void pdf_should_be_rendered_for_pdf_backend(@ArquillianResource Asciidoctor asciidoctor) {

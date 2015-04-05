@@ -16,8 +16,8 @@ import static org.junit.Assert.assertThat;
 @RunWith(Arquillian.class)
 public class WhenDocumentContainsDitaaDiagram {
 
-    @Rule
-    public ClasspathResources classpath = new ClasspathResources();
+    @ArquillianResource
+    public ClasspathResources classpath;
 
     @Test
     public void png_should_be_rendered_for_diagram(@ArquillianResource Asciidoctor asciidoctor) {

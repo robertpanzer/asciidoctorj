@@ -58,8 +58,8 @@ public class WhenAsciiDocIsRenderedToDocument {
             "\n" +
             "content";
 
-    @Rule
-    public ClasspathResources classpath = new ClasspathResources();
+    @ArquillianResource
+    public ClasspathResources classpath;
 
     @Test
     public void should_return_section_blocks(@ArquillianResource Asciidoctor asciidoctor) {

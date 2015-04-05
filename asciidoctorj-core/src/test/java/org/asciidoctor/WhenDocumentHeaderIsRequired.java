@@ -21,8 +21,8 @@ import static org.junit.Assert.assertThat;
 @RunWith(Arquillian.class)
 public class WhenDocumentHeaderIsRequired {
 
-    @Rule
-    public ClasspathResources classpath = new ClasspathResources();
+    @ArquillianResource
+    public ClasspathResources classpath;
     
 	@Rule
     public TemporaryFolder testFolder = new TemporaryFolder();

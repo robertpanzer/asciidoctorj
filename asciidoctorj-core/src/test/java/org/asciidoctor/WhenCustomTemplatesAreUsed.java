@@ -17,8 +17,8 @@ import static org.junit.Assert.assertThat;
 @RunWith(Arquillian.class)
 public class WhenCustomTemplatesAreUsed {
 
-    @Rule
-    public ClasspathResources classpath = new ClasspathResources();
+    @ArquillianResource
+    public ClasspathResources classpath;
     
     @Test
     public void document_should_be_rendered_using_given_template_dir(@ArquillianResource Asciidoctor asciidoctor) {
