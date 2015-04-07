@@ -82,6 +82,22 @@ content'''
         document.doctitle() == 'Document Title'
     }
 
+    def 'should convert all blocks to AsciidoctorJ AST types'() {
+        when:
+        DocumentRuby document = asciidoctor.load(DOCUMENT, [:])
+
+        for (Object block: document.blocks()) {
+            (AbstractBlock) block
+        }
+        for (Object block: document.blocks()) {
+            (AbstractBlock) block
+        }
+
+        then:
+            notThrown(ClassCastException)
+    }
+
+
     def 'should find elements from document'() {
         when:
         DocumentRuby document = asciidoctor.load(DOCUMENT, [:])
