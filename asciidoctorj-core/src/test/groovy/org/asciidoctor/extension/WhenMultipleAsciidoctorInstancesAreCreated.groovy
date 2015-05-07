@@ -2,6 +2,12 @@ package org.asciidoctor.extension
 
 import org.asciidoctor.Asciidoctor
 import org.asciidoctor.OptionsBuilder
+import org.jruby.CompatVersion
+import org.jruby.Ruby
+import org.jruby.RubyInstanceConfig
+import org.jruby.exceptions.RaiseException
+import org.jruby.javasupport.JavaEmbedUtils
+import org.jruby.runtime.builtin.IRubyObject
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
@@ -63,4 +69,76 @@ $ gem install asciidoctor-diagram
 
     }
 
+    String CLASS_SCRIPT = '''
+
+class U
+    attr_accessor :b
+    def initialize
+        @b = 2
+    end
+end
+
+class T
+    def initialize
+        @u = U.new
+    end
+    def u=(u)
+        @u = u
+        raise RuntimeError unless u.class == U
+    end
+    def u
+        @u
+    end
+end
+'''
+
+    def "should fail when copying object between Ruby runtimes and class is checked"() {
+
+        given:
+
+        Ruby ruby1 = JavaEmbedUtils.initialize(Collections.emptyList(), createOptimizedConfiguration())
+        Ruby ruby2 = JavaEmbedUtils.initialize(Collections.emptyList(), createOptimizedConfiguration())
+
+        ruby1.evalScriptlet(CLASS_SCRIPT)
+        T t1 = JavaEmbedUtils.rubyToJava(ruby1, ruby1.evalScriptlet('T.new'), T)
+
+        ruby2.evalScriptlet(CLASS_SCRIPT)
+        T t2 = JavaEmbedUtils.rubyToJava(ruby2, ruby2.evalScriptlet('T.new'), T)
+
+        when:
+
+        t1.u = t2.u
+
+        then:
+
+        thrown(RaiseException)
+    }
+
+    def "should not fail when copying object in same Ruby runtime and class is checked"() {
+
+        given:
+
+        Ruby ruby1 = JavaEmbedUtils.initialize(Collections.emptyList(), createOptimizedConfiguration())
+
+        ruby1.evalScriptlet(CLASS_SCRIPT)
+        T t1 = JavaEmbedUtils.rubyToJava(ruby1, ruby1.evalScriptlet('T.new'), T)
+
+        when:
+
+        t1.u = t1.u
+
+        then:
+
+        noExceptionThrown()
+    }
+
+    private RubyInstanceConfig createOptimizedConfiguration() {
+        RubyInstanceConfig config = new RubyInstanceConfig()
+        config.setCompatVersion(CompatVersion.RUBY2_0)
+        config.setCompileMode(RubyInstanceConfig.CompileMode.OFF)
+
+        config
+    }
+
 }
+
