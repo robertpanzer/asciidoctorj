@@ -37,7 +37,11 @@ class TableTestConverter extends AbstractConverter {
                     row -> row.cells.collect { cell -> cell.text.padRight(COLWIDTH) }.join(COL_SEPARATOR)
                 }
 
-        [header, body].flatten().join(NEWLINE)
+        def footer =
+                [ table.footer.cells.collect { '=' * COLWIDTH }.join('#'),
+                  table.footer.cells.collect { it.text.padRight(COLWIDTH) }.join(COL_SEPARATOR)]
+
+        [header, body, footer].flatten().join(NEWLINE)
 
     }
 

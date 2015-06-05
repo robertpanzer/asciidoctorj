@@ -28,7 +28,8 @@ public class TableImpl extends AbstractBlockImpl implements Table {
 
     @Override
     public Row getFooter() {
-        return null;
+        Rows rows = new Rows(getRubyProperty("rows"));
+        return rows.getFooter();
     }
 
     @Override
@@ -70,6 +71,14 @@ public class TableImpl extends AbstractBlockImpl implements Table {
                 ret.add(new RowImpl((IRubyObject) rubyRow));
             }
             return ret;
+        }
+
+        private Row getFooter() {
+            RubyArray footerRows = (RubyArray) getRubyProperty("foot");
+            if (footerRows == null || footerRows.size() == 0) {
+                return null;
+            }
+            return new RowImpl(footerRows.at(RubyFixnum.newFixnum(getRuntime(), 0)));
         }
     }
 }

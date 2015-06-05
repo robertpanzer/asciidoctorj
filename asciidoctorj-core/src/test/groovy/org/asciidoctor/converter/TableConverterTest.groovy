@@ -12,11 +12,14 @@ class TableConverterTest extends Specification {
 
     private static final String DOCUMENT = '''= Hello Table
 
+[options="header,footer"]
 |====
 |       | Column A | Column B
 
 | Row 1 |   A1     |    B1
 | Row 2 |   A2     |    B2
+
+| Sum   | Sum A    | Sum B
 |====
 '''
 
@@ -34,7 +37,9 @@ class TableConverterTest extends Specification {
         content.replaceAll(' ', '') == '''               |Column A       |Column B
 ---------------+---------------+---------------
 Row 1          |A1             |B1
-Row 2          |A2             |B2             '''.replaceAll(' ', '')
+Row 2          |A2             |B2
+===============#===============#===============
+Sum            |Sum A          |Sum B          '''.replaceAll(' ', '')
     }
 
 }
