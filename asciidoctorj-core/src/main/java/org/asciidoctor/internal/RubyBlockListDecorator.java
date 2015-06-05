@@ -2,6 +2,8 @@ package org.asciidoctor.internal;
 
 import org.asciidoctor.ast.AbstractBlock;
 import org.asciidoctor.ast.AbstractBlockImpl;
+import org.asciidoctor.ast.AbstractNode;
+import org.asciidoctor.ast.AbstractNodeImpl;
 import org.asciidoctor.ast.NodeConverter;
 import org.jruby.RubyArray;
 
@@ -13,7 +15,7 @@ import java.util.ListIterator;
 
 
 
-public class RubyBlockListDecorator implements List<AbstractBlock> {
+public class RubyBlockListDecorator<T extends AbstractNode> implements List<T> {
 
     private final RubyArray rubyBlockList;
 
@@ -40,8 +42,8 @@ public class RubyBlockListDecorator implements List<AbstractBlock> {
     }
 
     @Override
-    public Iterator<AbstractBlock> iterator() {
-        return new Iterator<AbstractBlock>() {
+    public Iterator<T> iterator() {
+        return new Iterator<T>() {
             int index = 0;
             @Override
             public boolean hasNext() {
@@ -49,7 +51,7 @@ public class RubyBlockListDecorator implements List<AbstractBlock> {
             }
 
             @Override
-            public AbstractBlock next() {
+            public T next() {
                 return get(index++);
             }
 
@@ -80,7 +82,7 @@ public class RubyBlockListDecorator implements List<AbstractBlock> {
     }
 
     @Override
-    public boolean add(AbstractBlock abstractBlock) {
+    public boolean add(T abstractBlock) {
         return rubyBlockList.add(((AbstractBlockImpl) abstractBlock).getRubyObject());
     }
 
@@ -98,12 +100,12 @@ public class RubyBlockListDecorator implements List<AbstractBlock> {
     }
 
     @Override
-    public boolean addAll(Collection<? extends AbstractBlock> c) {
+    public boolean addAll(Collection<? extends T> c) {
         return rubyBlockList.addAll(getDelegateCollection(c));
     }
 
     @Override
-    public boolean addAll(int index, Collection<? extends AbstractBlock> c) {
+    public boolean addAll(int index, Collection<? extends T> c) {
         return rubyBlockList.addAll(index, getDelegateCollection(c));
     }
 
@@ -149,28 +151,28 @@ public class RubyBlockListDecorator implements List<AbstractBlock> {
     }
 
     @Override
-    public AbstractBlock get(int index) {
-        return (AbstractBlock) NodeConverter.createASTNode(rubyBlockList.get(index));
+    public T get(int index) {
+        return (T) NodeConverter.createASTNode(rubyBlockList.get(index));
     }
 
     @Override
-    public AbstractBlock set(int index, AbstractBlock element) {
+    public T set(int index, T element) {
         Object oldObject = rubyBlockList.set(index, ((AbstractBlockImpl) element).getRubyObject());
-        return (AbstractBlock) NodeConverter.createASTNode(oldObject);
+        return (T) NodeConverter.createASTNode(oldObject);
     }
 
     @Override
-    public void add(int index, AbstractBlock element) {
-        rubyBlockList.add(index, ((AbstractBlockImpl) element).getRubyObject());
+    public void add(int index, T element) {
+        rubyBlockList.add(index, ((AbstractNodeImpl) element).getRubyObject());
     }
 
     @Override
-    public AbstractBlock remove(int index) {
+    public T remove(int index) {
         Object oldObject = rubyBlockList.remove(index);
         if (oldObject == null) {
             return null;
         } else {
-            return (AbstractBlock) NodeConverter.createASTNode(oldObject);
+            return (T) NodeConverter.createASTNode(oldObject);
         }
     }
 
@@ -193,17 +195,17 @@ public class RubyBlockListDecorator implements List<AbstractBlock> {
     }
 
     @Override
-    public ListIterator<AbstractBlock> listIterator() {
+    public ListIterator<T> listIterator() {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public ListIterator<AbstractBlock> listIterator(int index) {
+    public ListIterator<T> listIterator(int index) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public List<AbstractBlock> subList(int fromIndex, int toIndex) {
+    public List<T> subList(int fromIndex, int toIndex) {
         throw new UnsupportedOperationException();
     }
 }

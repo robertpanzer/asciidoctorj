@@ -13,17 +13,23 @@ import org.jruby.runtime.builtin.IRubyObject;
  */
 public final class NodeConverter {
 
-    private static final String BLOCK_CLASS = "Asciidoctor::Block";
+    private static final String BLOCK_CLASS        = "Asciidoctor::Block";
 
-    private static final String SECTION_CLASS = "Asciidoctor::Section";
+    private static final String SECTION_CLASS      = "Asciidoctor::Section";
 
-    private static final String DOCUMENT_CLASS = "Asciidoctor::Document";
+    private static final String DOCUMENT_CLASS     = "Asciidoctor::Document";
 
-    private static final String INLINE_CLASS = "Asciidoctor::Inline";
+    private static final String INLINE_CLASS       = "Asciidoctor::Inline";
 
-    private static final String LIST_CLASS = "Asciidoctor::List";
+    private static final String LIST_CLASS         = "Asciidoctor::List";
 
-    private static final String LIST_ITEM_CLASS = "Asciidoctor::ListItem";
+    private static final String LIST_ITEM_CLASS    = "Asciidoctor::ListItem";
+
+    private static final String TABLE_CLASS        = "Asciidoctor::Table";
+
+    private static final String TABLE_COLUMN_CLASS = "Asciidoctor::Table::Column";
+
+    private static final String TABLE_CELL_CLASS   = "Asciidoctor::Table::Cell";
 
     private NodeConverter() {}
 
@@ -53,6 +59,12 @@ public final class NodeConverter {
                 ret = new ListImpl(rubyObject);
             } else if (LIST_ITEM_CLASS.equals(rubyClassName)) {
                 ret = new ListItemImpl(rubyObject);
+            } else if (TABLE_CLASS.equals(rubyClassName)) {
+                ret = new TableImpl(rubyObject);
+            } else if (TABLE_COLUMN_CLASS.equals(rubyClassName)) {
+                ret = new ColumnImpl(rubyObject);
+            } else if (TABLE_CELL_CLASS.equals(rubyClassName)) {
+                ret = new CellImpl(rubyObject);
             } else {
                 throw new IllegalArgumentException("Don't know what to do with a " + rubyObject);
             }
