@@ -116,11 +116,15 @@ public class Processor {
     public Table createTable(AbstractBlock parent, Map<String, Object> attributes) {
         Ruby rubyRuntime = getRubyRuntimeFromNode(parent);
 
+        RubyHash rubyAttributes = RubyHash.newHash(rubyRuntime);
+        rubyAttributes.putAll(attributes);
+
         IRubyObject rubyClass = rubyRuntime.evalScriptlet(NodeConverter.TABLE_CLASS);
-        Object[] parameters = {
+        IRubyObject[] parameters = {
                 ((AbstractBlockImpl) parent).getRubyObject(),
-                attributes};
-        Table ret = (Table) NodeConverter.createASTNode(JavaEmbedUtils.invokeMethod(rubyRuntime, rubyClass, "new", parameters, Table.class));
+                rubyAttributes};
+        IRubyObject rubyTable = rubyClass.callMethod(rubyRuntime.getCurrentContext(), "new", parameters);
+        Table ret = (Table) NodeConverter.createASTNode(rubyTable);//JavaEmbedUtils.invokeMethod(rubyRuntime, rubyClass, "new", parameters, Table.class));
         ret.setAttr("rowcount", 0, false);
         return ret;
     }

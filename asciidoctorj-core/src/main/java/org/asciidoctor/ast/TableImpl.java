@@ -15,8 +15,11 @@ import java.util.ListIterator;
 
 public class TableImpl extends AbstractBlockImpl implements Table {
 
+    private Rows rows;
+
     public TableImpl(IRubyObject rubyObject) {
         super(rubyObject);
+        rows = new Rows(getRubyProperty("rows"));
     }
 
     @Override
@@ -32,21 +35,27 @@ public class TableImpl extends AbstractBlockImpl implements Table {
 
     @Override
     public Row getFooter() {
-        Rows rows = new Rows(getRubyProperty("rows"));
         return rows.getFooter();
     }
 
     @Override
-    public List<Row> getBody() {
-
-        Rows rows = new Rows(getRubyProperty("rows"));
-        return rows.getBody();
-
+    public void setFooter(Row row) {
+        rows.setFooterRow(row);
     }
 
+    @Override
+    public List<Row> getBody() {
+        return rows.getBody();
+    }
+
+    @Override
     public Row getHeader() {
-        Rows rows = new Rows(getRubyProperty("rows"));
         return rows.getHeader();
+    }
+
+    @Override
+    public void setHeader(Row row) {
+        rows.setHeaderRow(row);
     }
 
     private class Rows extends RubyObjectWrapper {
@@ -63,6 +72,11 @@ public class TableImpl extends AbstractBlockImpl implements Table {
             return new RowImpl(headerRows.at(RubyFixnum.newFixnum(getRuntime(), 0)));
         }
 
+        private void setHeaderRow(Row row) {
+            RubyArray newHeaderRows = getRuntime().newArray((IRubyObject) ((RowImpl) row).getRubyCells());
+            getRubyObject().getInstanceVariables().setInstanceVariable("@head", newHeaderRows);
+        }
+
         private List<Row> getBody() {
             RubyArray bodyRows = (RubyArray) getRubyProperty("body");
 
@@ -76,6 +90,12 @@ public class TableImpl extends AbstractBlockImpl implements Table {
             }
             return new RowImpl(footerRows.at(RubyFixnum.newFixnum(getRuntime(), 0)));
         }
+
+        private void setFooterRow(Row row) {
+            RubyArray newFooterRows = getRuntime().newArray((IRubyObject) ((RowImpl) row).getRubyCells());
+            getRubyObject().getInstanceVariables().setInstanceVariable("@foot", newFooterRows);
+        }
+
     }
 
 

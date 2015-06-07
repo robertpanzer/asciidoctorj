@@ -29,6 +29,22 @@ class TableCreatorTreeProcessor extends Treeprocessor {
         Cell cell = createTableCell(column, 'A1')
         row.cells.add(cell)
 
+        // Create and add a row to the table
+        Row headerRow = createTableRow(table)
+        table.header = headerRow
+
+        // Create and add a cell to the row
+        Cell headerCell = createTableCell(column, 'A')
+        headerRow.cells.add(headerCell)
+
+        // Create and add a row to the table
+        Row footerRow = createTableRow(table)
+        table.footer = footerRow
+
+        // Create and add a cell to the row
+        Cell footerCell = createTableCell(column, 'Sum of A')
+        footerRow.cells.add(footerCell)
+
         document
     }
 }

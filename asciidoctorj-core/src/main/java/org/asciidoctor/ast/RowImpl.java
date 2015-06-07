@@ -18,4 +18,8 @@ public class RowImpl extends RubyObjectWrapper implements Row {
         return new RubyBlockListDecorator<Cell>((RubyArray) getRubyObject());
     }
 
+    public RubyArray getRubyCells() {
+        return (RubyArray) getRubyObject();
+    }
+
 }

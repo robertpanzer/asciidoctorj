@@ -10,7 +10,11 @@ public interface Table extends AbstractBlock {
 
     Row getHeader();
 
+    void setHeader(Row row);
+
     Row getFooter();
+
+    void setFooter(Row row);
 
     List<Row> getBody();
 
