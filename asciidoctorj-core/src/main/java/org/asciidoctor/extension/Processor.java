@@ -2,10 +2,10 @@ package org.asciidoctor.extension;
 
 import org.asciidoctor.Options;
 import org.asciidoctor.ast.*;
-import org.asciidoctor.internal.RubyHashMapDecorator;
 import org.asciidoctor.internal.RubyHashUtil;
 import org.asciidoctor.internal.RubyUtils;
 import org.jruby.Ruby;
+import org.jruby.RubyArray;
 import org.jruby.RubyHash;
 import org.jruby.java.proxies.RubyObjectHolderProxy;
 import org.jruby.javasupport.JavaEmbedUtils;
@@ -108,6 +108,63 @@ public class Processor {
         this.configFinalized = true;
     }
 
+
+    public Table createTable(AbstractBlock parent) {
+        return createTable(parent, new HashMap<String, Object>());
+    }
+
+    public Table createTable(AbstractBlock parent, Map<String, Object> attributes) {
+        Ruby rubyRuntime = getRubyRuntimeFromNode(parent);
+
+        IRubyObject rubyClass = rubyRuntime.evalScriptlet(NodeConverter.TABLE_CLASS);
+        Object[] parameters = {
+                ((AbstractBlockImpl) parent).getRubyObject(),
+                attributes};
+        Table ret = (Table) NodeConverter.createASTNode(JavaEmbedUtils.invokeMethod(rubyRuntime, rubyClass, "new", parameters, Table.class));
+        ret.setAttr("rowcount", 0, false);
+        return ret;
+    }
+
+    public Row createTableRow(Table parent) {
+        Ruby rubyRuntime = getRubyRuntimeFromNode(parent);
+
+        RubyArray rubyRow = rubyRuntime.newArray();
+        return new RowImpl(rubyRow);
+    }
+
+    public Column createTableColumn(Table parent, int index) {
+        return createTableColumn(parent, index, new HashMap<String, Object>());
+    }
+
+    public Column createTableColumn(Table parent, int index, Map<String, Object> attributes) {
+        Ruby rubyRuntime = getRubyRuntimeFromNode(parent);
+
+        IRubyObject rubyClass = rubyRuntime.evalScriptlet(NodeConverter.TABLE_COLUMN_CLASS);
+        Object[] parameters = {
+                ((AbstractBlockImpl) parent).getRubyObject(),
+                index,
+                attributes}; // No cursor parameter yet
+
+        Column ret = (Column) NodeConverter.createASTNode(JavaEmbedUtils.invokeMethod(rubyRuntime, rubyClass, "new", parameters, Column.class));
+        return ret;
+    }
+
+    public Cell createTableCell(Column column, String text) {
+        return createTableCell(column, text, new HashMap<String, Object>());
+    }
+
+    public Cell createTableCell(Column column, String text, Map<String, Object> attributes) {
+        Ruby rubyRuntime = getRubyRuntimeFromNode(column);
+
+        IRubyObject rubyClass = rubyRuntime.evalScriptlet(NodeConverter.TABLE_CELL_CLASS);
+        Object[] parameters = {
+                ((ColumnImpl) column).getRubyObject(),
+                text,
+                attributes}; // No cursor parameter yet
+        Cell ret = (Cell) NodeConverter.createASTNode(JavaEmbedUtils.invokeMethod(rubyRuntime, rubyClass, "new", parameters, Cell.class));
+        return ret;
+    }
+
     public Block createBlock(AbstractBlock parent, String context, String content, Map<String, Object> attributes) {
         return createBlock(parent, context, content, attributes, new HashMap<Object, Object>());
     }
@@ -185,6 +242,8 @@ public class Processor {
                 convertMapToRubyHashWithSymbols };
         return (Block) NodeConverter.createASTNode(JavaEmbedUtils.invokeMethod(rubyRuntime, rubyClass, "new", parameters, Block.class));
     }
+
+
 
     private Ruby getRubyRuntimeFromNode(AbstractNode node) {
         if (node instanceof IRubyObject) {

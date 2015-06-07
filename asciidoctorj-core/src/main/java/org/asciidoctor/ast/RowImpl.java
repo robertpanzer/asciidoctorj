@@ -9,7 +9,7 @@ import java.util.List;
 
 public class RowImpl extends RubyObjectWrapper implements Row {
 
-    RowImpl(IRubyObject rubyObject) {
+    public RowImpl(IRubyObject rubyObject) {
         super(rubyObject);
     }
 

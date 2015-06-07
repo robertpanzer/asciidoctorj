@@ -13,23 +13,23 @@ import org.jruby.runtime.builtin.IRubyObject;
  */
 public final class NodeConverter {
 
-    private static final String BLOCK_CLASS        = "Asciidoctor::Block";
+    public static final String BLOCK_CLASS        = "Asciidoctor::Block";
 
-    private static final String SECTION_CLASS      = "Asciidoctor::Section";
+    public static final String SECTION_CLASS      = "Asciidoctor::Section";
 
-    private static final String DOCUMENT_CLASS     = "Asciidoctor::Document";
+    public static final String DOCUMENT_CLASS     = "Asciidoctor::Document";
 
-    private static final String INLINE_CLASS       = "Asciidoctor::Inline";
+    public static final String INLINE_CLASS       = "Asciidoctor::Inline";
 
-    private static final String LIST_CLASS         = "Asciidoctor::List";
+    public static final String LIST_CLASS         = "Asciidoctor::List";
 
-    private static final String LIST_ITEM_CLASS    = "Asciidoctor::ListItem";
+    public static final String LIST_ITEM_CLASS    = "Asciidoctor::ListItem";
 
-    private static final String TABLE_CLASS        = "Asciidoctor::Table";
+    public static final String TABLE_CLASS        = "Asciidoctor::Table";
 
-    private static final String TABLE_COLUMN_CLASS = "Asciidoctor::Table::Column";
+    public static final String TABLE_COLUMN_CLASS = "Asciidoctor::Table::Column";
 
-    private static final String TABLE_CELL_CLASS   = "Asciidoctor::Table::Cell";
+    public static final String TABLE_CELL_CLASS   = "Asciidoctor::Table::Cell";
 
     private NodeConverter() {}
 

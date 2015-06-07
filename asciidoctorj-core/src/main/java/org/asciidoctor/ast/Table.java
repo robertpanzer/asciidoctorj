@@ -2,7 +2,7 @@ package org.asciidoctor.ast;
 
 import java.util.List;
 
-public interface Table {
+public interface Table extends AbstractBlock {
 
     boolean hasHeaderOption();
 

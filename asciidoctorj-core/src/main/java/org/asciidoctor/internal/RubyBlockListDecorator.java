@@ -1,7 +1,5 @@
 package org.asciidoctor.internal;
 
-import org.asciidoctor.ast.AbstractBlock;
-import org.asciidoctor.ast.AbstractBlockImpl;
 import org.asciidoctor.ast.AbstractNode;
 import org.asciidoctor.ast.AbstractNodeImpl;
 import org.asciidoctor.ast.NodeConverter;
@@ -35,10 +33,10 @@ public class RubyBlockListDecorator<T extends AbstractNode> implements List<T> {
 
     @Override
     public boolean contains(Object o) {
-        if (!(o instanceof AbstractBlockImpl)) {
+        if (!(o instanceof AbstractNodeImpl)) {
             return false;
         }
-        return rubyBlockList.contains(((AbstractBlockImpl) o).getRubyObject());
+        return rubyBlockList.contains(((AbstractNodeImpl) o).getRubyObject());
     }
 
     @Override
@@ -72,26 +70,26 @@ public class RubyBlockListDecorator<T extends AbstractNode> implements List<T> {
         return getJavaBlockList().toArray(a);
     }
 
-    private List<AbstractBlock> getJavaBlockList() {
-        List<AbstractBlock> javaBlockList = new ArrayList<AbstractBlock>(rubyBlockList.size());
+    private List<T> getJavaBlockList() {
+        List<T> javaBlockList = new ArrayList<T>(rubyBlockList.size());
         Object[] ret = new Object[size()];
         for (int i = 0; i < rubyBlockList.size(); i++) {
-            javaBlockList.add((AbstractBlock) NodeConverter.createASTNode(rubyBlockList.get(i)));
+            javaBlockList.add((T) NodeConverter.createASTNode(rubyBlockList.get(i)));
         }
         return javaBlockList;
     }
 
     @Override
     public boolean add(T abstractBlock) {
-        return rubyBlockList.add(((AbstractBlockImpl) abstractBlock).getRubyObject());
+        return rubyBlockList.add(((AbstractNodeImpl) abstractBlock).getRubyObject());
     }
 
     @Override
     public boolean remove(Object o) {
-        if (!(o instanceof AbstractBlock)) {
+        if (!(o instanceof AbstractNodeImpl)) {
             return false;
         }
-        return rubyBlockList.remove(((AbstractBlockImpl) o).getRubyObject());
+        return rubyBlockList.remove(((AbstractNodeImpl) o).getRubyObject());
     }
 
     @Override
@@ -112,8 +110,8 @@ public class RubyBlockListDecorator<T extends AbstractNode> implements List<T> {
     private Collection<Object> getDelegateCollection(Collection<?> c) {
         Collection<Object> delegateList = new ArrayList<Object>(c.size());
         for (Object o: c) {
-            if (o instanceof AbstractBlockImpl) {
-                delegateList.add(((AbstractBlockImpl) o).getRubyObject());
+            if (o instanceof AbstractNodeImpl) {
+                delegateList.add(((AbstractNodeImpl) o).getRubyObject());
             } else {
                 delegateList.add(o);
             }
@@ -157,7 +155,7 @@ public class RubyBlockListDecorator<T extends AbstractNode> implements List<T> {
 
     @Override
     public T set(int index, T element) {
-        Object oldObject = rubyBlockList.set(index, ((AbstractBlockImpl) element).getRubyObject());
+        Object oldObject = rubyBlockList.set(index, ((AbstractNodeImpl) element).getRubyObject());
         return (T) NodeConverter.createASTNode(oldObject);
     }
 
@@ -178,8 +176,8 @@ public class RubyBlockListDecorator<T extends AbstractNode> implements List<T> {
 
     @Override
     public int indexOf(Object o) {
-        if (o instanceof AbstractBlock) {
-            return rubyBlockList.indexOf(((AbstractBlockImpl) o).getRubyObject());
+        if (o instanceof AbstractNodeImpl) {
+            return rubyBlockList.indexOf(((AbstractNodeImpl) o).getRubyObject());
         } else {
             return -1;
         }
@@ -187,8 +185,8 @@ public class RubyBlockListDecorator<T extends AbstractNode> implements List<T> {
 
     @Override
     public int lastIndexOf(Object o) {
-        if (o instanceof AbstractBlock) {
-            return rubyBlockList.lastIndexOf(((AbstractBlockImpl) o).getRubyObject());
+        if (o instanceof AbstractNodeImpl) {
+            return rubyBlockList.lastIndexOf(((AbstractNodeImpl) o).getRubyObject());
         } else {
             return -1;
         }
