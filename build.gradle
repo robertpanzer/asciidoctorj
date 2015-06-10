@@ -100,9 +100,6 @@ configure(subprojects.findAll { !it.name.endsWith('-distribution') }) {
       exclude group: 'org.hamcrest', module: 'hamcrest-core'
     }
     testCompile "org.codehaus.groovy:groovy-all:$groovyVersion"
-    testCompile "org.jboss.arquillian.junit:arquillian-junit-container:$arquillianVersion"
-    testCompile "org.jboss.arquillian.spock:arquillian-spock-container:$arquillianSpockVersion"
-
   }
   apply plugin: 'codenarc'
   codenarc {
