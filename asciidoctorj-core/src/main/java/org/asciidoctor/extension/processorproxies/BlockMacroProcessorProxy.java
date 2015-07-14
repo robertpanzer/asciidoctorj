@@ -20,6 +20,7 @@ import org.jruby.runtime.ThreadContext;
 import org.jruby.runtime.builtin.IRubyObject;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.HashMap;
 import java.util.Map;
 
 public class BlockMacroProcessorProxy extends AbstractMacroProcessorProxy<BlockMacroProcessor> {
@@ -32,16 +33,6 @@ public class BlockMacroProcessorProxy extends AbstractMacroProcessorProxy<BlockM
         super(runtime, metaClass, blockMacroProcessor);
     }
 
-    public static RubyClass register(final Ruby rubyRuntime, final String blockMacroProcessorClassName) {
-
-        try {
-            Class<? extends BlockMacroProcessor>  blockMacroProcessorClass = (Class<? extends BlockMacroProcessor>) Class.forName(blockMacroProcessorClassName);
-            return register(rubyRuntime, blockMacroProcessorClass);
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
     public static RubyClass register(final Ruby rubyRuntime, final Class<? extends BlockMacroProcessor> blockMacroProcessor) {
         RubyClass rubyClass = ProcessorProxyUtil.defineProcessorClass(rubyRuntime, "BlockMacroProcessor", new ObjectAllocator() {
             @Override
@@ -49,6 +40,9 @@ public class BlockMacroProcessorProxy extends AbstractMacroProcessorProxy<BlockM
                 return new BlockMacroProcessorProxy(runtime, klazz, blockMacroProcessor);
             }
         });
+
+        applyAnnotations(blockMacroProcessor, rubyClass);
+
         ProcessorProxyUtil.defineAnnotatedMethods(rubyClass, BlockMacroProcessorProxy.class);
         return rubyClass;
     }
@@ -60,6 +54,9 @@ public class BlockMacroProcessorProxy extends AbstractMacroProcessorProxy<BlockM
                 return new BlockMacroProcessorProxy(runtime, klazz, blockMacroProcessor);
             }
         });
+
+        applyAnnotations(blockMacroProcessor.getClass(), rubyClass);
+
         ProcessorProxyUtil.defineAnnotatedMethods(rubyClass, BlockMacroProcessorProxy.class);
         return rubyClass;
     }
@@ -82,11 +79,12 @@ public class BlockMacroProcessorProxy extends AbstractMacroProcessorProxy<BlockM
             getProcessor().setConfig(new RubyHashMapDecorator((RubyHash)getInstanceVariable(MEMBER_NAME_CONFIG)));
         } else {
             // First create only the instance passing in the name
-            setProcessor(
-                    getProcessorClass()
-                            .getConstructor(String.class)
-                            .newInstance(
-                                    RubyUtils.rubyToJava(getRuntime(), args[0], String.class)));
+            String macroName = RubyUtils.rubyToJava(getRuntime(), args[0], String.class);
+            setProcessor(instantiateProcessor(macroName, new HashMap<String, Object>()));
+
+            if (getProcessor().getName() == null) {
+                getProcessor().setName(macroName);
+            }
 
             // Then create the config hash that may contain config options defined in the Java constructor
             RubyHash config = RubyHashUtil.convertMapToRubyHashWithSymbols(context.getRuntime(), getProcessor().getConfig());

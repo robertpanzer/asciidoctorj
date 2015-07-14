@@ -20,6 +20,7 @@ import org.jruby.runtime.ThreadContext;
 import org.jruby.runtime.builtin.IRubyObject;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.HashMap;
 import java.util.Map;
 
 public class BlockProcessorProxy extends AbstractProcessorProxy<BlockProcessor> {
@@ -32,16 +33,6 @@ public class BlockProcessorProxy extends AbstractProcessorProxy<BlockProcessor> 
         super(runtime, metaClass, blockProcessor);
     }
 
-    public static RubyClass register(final Ruby rubyRuntime, final String blockProcessorClassName) {
-
-        try {
-            Class<? extends BlockProcessor>  blockProcessorClass = (Class<? extends BlockProcessor>) Class.forName(blockProcessorClassName);
-            return register(rubyRuntime, blockProcessorClass);
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
     public static RubyClass register(final Ruby rubyRuntime, final Class<? extends BlockProcessor> blockProcessor) {
         RubyClass rubyClass = ProcessorProxyUtil.defineProcessorClass(rubyRuntime, "BlockProcessor", new ObjectAllocator() {
             @Override
@@ -49,6 +40,9 @@ public class BlockProcessorProxy extends AbstractProcessorProxy<BlockProcessor> 
                 return new BlockProcessorProxy(runtime, klazz, blockProcessor);
             }
         });
+
+        applyAnnotations(blockProcessor, rubyClass);
+
         ProcessorProxyUtil.defineAnnotatedMethods(rubyClass, BlockProcessorProxy.class);
         return rubyClass;
     }
@@ -60,6 +54,9 @@ public class BlockProcessorProxy extends AbstractProcessorProxy<BlockProcessor> 
                 return new BlockProcessorProxy(runtime, klazz, blockProcessor);
             }
         });
+
+        applyAnnotations(blockProcessor.getClass(), rubyClass);
+
         ProcessorProxyUtil.defineAnnotatedMethods(rubyClass, BlockProcessorProxy.class);
         return rubyClass;
     }
@@ -82,12 +79,13 @@ public class BlockProcessorProxy extends AbstractProcessorProxy<BlockProcessor> 
             getProcessor().setConfig(new RubyHashMapDecorator((RubyHash) getInstanceVariable(MEMBER_NAME_CONFIG)));
         } else {
 
+            String macroName = RubyUtils.rubyToJava(getRuntime(), args[0], String.class);
             // First create only the instance passing in the block name
-            setProcessor(
-                    getProcessorClass()
-                            .getConstructor(String.class)
-                            .newInstance(
-                                    RubyUtils.rubyToJava(getRuntime(), args[0], String.class)));
+            setProcessor(instantiateProcessor(macroName, new HashMap<String, Object>()));
+
+            if (getProcessor().getName() == null) {
+                getProcessor().setName(macroName);
+            }
 
             // Then create the config hash that may contain config options defined in the Java constructor
             RubyHash config = RubyHashUtil.convertMapToRubyHashWithSymbols(context.getRuntime(), getProcessor().getConfig());

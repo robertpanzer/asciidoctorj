@@ -20,6 +20,7 @@ import org.jruby.runtime.ThreadContext;
 import org.jruby.runtime.builtin.IRubyObject;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.HashMap;
 import java.util.Map;
 
 public class IncludeProcessorProxy extends AbstractProcessorProxy<IncludeProcessor> {
@@ -32,16 +33,6 @@ public class IncludeProcessorProxy extends AbstractProcessorProxy<IncludeProcess
         super(runtime, metaClass, includeProcessor);
     }
 
-    public static RubyClass register(final Ruby rubyRuntime, final String includeProcessorClassName) {
-
-        try {
-            Class<? extends IncludeProcessor>  includeProcessorClass = (Class<? extends IncludeProcessor>) Class.forName(includeProcessorClassName);
-            return register(rubyRuntime, includeProcessorClass);
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
     public static RubyClass register(final Ruby rubyRuntime, final Class<? extends IncludeProcessor> includeProcessor) {
         RubyClass rubyClass = ProcessorProxyUtil.defineProcessorClass(rubyRuntime, "IncludeProcessor", new ObjectAllocator() {
             @Override
@@ -49,6 +40,9 @@ public class IncludeProcessorProxy extends AbstractProcessorProxy<IncludeProcess
                 return new IncludeProcessorProxy(runtime, klazz, includeProcessor);
             }
         });
+
+        applyAnnotations(includeProcessor, rubyClass);
+
         ProcessorProxyUtil.defineAnnotatedMethods(rubyClass, IncludeProcessorProxy.class);
         return rubyClass;
     }
@@ -60,6 +54,9 @@ public class IncludeProcessorProxy extends AbstractProcessorProxy<IncludeProcess
                 return new IncludeProcessorProxy(runtime, klazz, includeProcessor);
             }
         });
+
+        applyAnnotations(includeProcessor.getClass(), rubyClass);
+
         ProcessorProxyUtil.defineAnnotatedMethods(rubyClass, IncludeProcessorProxy.class);
         return rubyClass;
     }
@@ -82,10 +79,7 @@ public class IncludeProcessorProxy extends AbstractProcessorProxy<IncludeProcess
             getProcessor().setConfig(new RubyHashMapDecorator((RubyHash) getInstanceVariable(MEMBER_NAME_CONFIG)));
         } else {
             // First create only the instance passing in the block name
-            setProcessor(
-                    getProcessorClass()
-                            .getConstructor()
-                            .newInstance());
+            setProcessor(instantiateProcessor(new HashMap<String, Object>()));
 
             // Then create the config hash that may contain config options defined in the Java constructor
             RubyHash config = RubyHashUtil.convertMapToRubyHashWithSymbols(context.getRuntime(), getProcessor().getConfig());

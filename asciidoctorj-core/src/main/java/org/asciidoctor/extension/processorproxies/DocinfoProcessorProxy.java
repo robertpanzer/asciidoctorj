@@ -1,12 +1,10 @@
 package org.asciidoctor.extension.processorproxies;
 
-import org.asciidoctor.ast.Document;
 import org.asciidoctor.ast.DocumentRuby;
 import org.asciidoctor.ast.NodeConverter;
 import org.asciidoctor.extension.DocinfoProcessor;
 import org.asciidoctor.internal.RubyHashMapDecorator;
 import org.asciidoctor.internal.RubyHashUtil;
-import org.asciidoctor.internal.RubyUtils;
 import org.jruby.Ruby;
 import org.jruby.RubyClass;
 import org.jruby.RubyHash;
@@ -19,6 +17,7 @@ import org.jruby.runtime.ThreadContext;
 import org.jruby.runtime.builtin.IRubyObject;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.HashMap;
 
 public class DocinfoProcessorProxy extends AbstractProcessorProxy<DocinfoProcessor> {
 
@@ -30,16 +29,6 @@ public class DocinfoProcessorProxy extends AbstractProcessorProxy<DocinfoProcess
         super(runtime, metaClass, docinfoProcessor);
     }
 
-    public static RubyClass register(final Ruby rubyRuntime, final String docinfoProcessorClassName) {
-
-        try {
-            Class<? extends DocinfoProcessor>  docinfoProcessorClass = (Class<? extends DocinfoProcessor>) Class.forName(docinfoProcessorClassName);
-            return register(rubyRuntime, docinfoProcessorClass);
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
     public static RubyClass register(final Ruby rubyRuntime, final Class<? extends DocinfoProcessor> docinfoProcessor) {
         RubyClass rubyClass = ProcessorProxyUtil.defineProcessorClass(rubyRuntime, "DocinfoProcessor", new ObjectAllocator() {
             @Override
@@ -47,6 +36,9 @@ public class DocinfoProcessorProxy extends AbstractProcessorProxy<DocinfoProcess
                 return new DocinfoProcessorProxy(runtime, klazz, docinfoProcessor);
             }
         });
+
+        applyAnnotations(docinfoProcessor, rubyClass);
+
         ProcessorProxyUtil.defineAnnotatedMethods(rubyClass, DocinfoProcessorProxy.class);
         return rubyClass;
     }
@@ -58,6 +50,9 @@ public class DocinfoProcessorProxy extends AbstractProcessorProxy<DocinfoProcess
                 return new DocinfoProcessorProxy(runtime, klazz, docinfoProcessor);
             }
         });
+
+        applyAnnotations(docinfoProcessor.getClass(), rubyClass);
+
         ProcessorProxyUtil.defineAnnotatedMethods(rubyClass, DocinfoProcessorProxy.class);
         return rubyClass;
     }
@@ -80,10 +75,7 @@ public class DocinfoProcessorProxy extends AbstractProcessorProxy<DocinfoProcess
             getProcessor().setConfig(new RubyHashMapDecorator((RubyHash) getInstanceVariable(MEMBER_NAME_CONFIG)));
         } else {
             // First create only the instance passing in the block name
-            setProcessor(
-                    getProcessorClass()
-                            .getConstructor()
-                            .newInstance());
+            setProcessor(instantiateProcessor(new HashMap<String, Object>()));
 
             // Then create the config hash that may contain config options defined in the Java constructor
             RubyHash config = RubyHashUtil.convertMapToRubyHashWithSymbols(context.getRuntime(), getProcessor().getConfig());

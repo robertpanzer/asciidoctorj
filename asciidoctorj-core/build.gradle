@@ -1,7 +1,4 @@
 configurations {
-  arquillianExtension
-  testCompile.extendsFrom arquillianExtension
-
   osgiBundle
   integrationTestOsgiCompile.extendsFrom testCompile
   integrationTestOsgiRuntime
@@ -30,13 +27,7 @@ dependencies {
   testCompile "com.google.guava:guava:$guavaVersion"
   testCompile "org.jsoup:jsoup:$jsoupVersion"
   testCompile "io.netty:netty-all:$nettyVersion"
-  testCompile project(path: ':asciidoctorj-test-support', configuration: 'tests')
-
-  arquillianExtension project(path: ':asciidoctorj-test-support', configuration: 'tests')
-  arquillianExtension "org.jboss.arquillian.container:arquillian-container-spi:$arquillianVersion"
-  arquillianExtension "org.jboss.arquillian.container:arquillian-container-test-spi:$arquillianVersion"
-  arquillianExtension "org.jboss.arquillian.container:arquillian-container-impl-base:$arquillianVersion"
-  arquillianExtension "org.jboss.arquillian.container:arquillian-container-test-impl-base:$arquillianVersion"
+  testCompile project(path: ':asciidoctorj-arquillian-extension')
 
   osgiBundle group: 'org.jboss.arquillian.osgi', name: 'arquillian-osgi-bundle', version: '2.1.0.CR18', transitive: false
 
@@ -47,6 +38,7 @@ dependencies {
   testCompile "org.apache.felix:org.apache.felix.main:5.0.0"
 //  integrationTestOsgiCompile "org.jboss.arquillian.container:arquillian-container-karaf-managed:2.1.0.CR18"
 //  integrationTestOsgiCompile "org.osgi:org.osgi.enterprise:5.0.0"
+  testCompile project(path: ':asciidoctorj-arquillian-extension')
 }
 
 def gemFiles = fileTree(jruby.gemInstallDir) {
@@ -62,21 +54,13 @@ jrubyPrepareGems << {
   }
 }
 
+javadoc {
+  classpath = sourceSets.main.output + sourceSets.main.compileClasspath + project(':asciidoctorj-test-support').sourceSets.test.output
+}
+
 //jruby {
 //	execVersion = '1.7.20'
 //}
-
-task arquillianExtensionJar(type: Jar, dependsOn: testClasses) {
-  baseName = "arquillianExtension-${project.archivesBaseName}"
-  from sourceSets.test.output
-  include 'org/asciidoctor/arquillian/**/*'
-  include 'META-INF/services/*'
-}
-
-
-artifacts {
-  arquillianExtension arquillianExtensionJar
-}
 
 jar {
   manifest {

@@ -100,7 +100,6 @@ public class RubyAttributesMapDecorator implements Map<String, Object> {
         Set<Entry<Object, Object>> rubyEntrySet = rubyHash.entrySet();
         for (Entry<Object, Object> o: rubyEntrySet) {
             String key;
-            Object value;
             Object rubyKey = o.getKey();
             Object rubyValue = o.getValue();
             if (rubyKey instanceof RubyString) {
@@ -108,9 +107,9 @@ public class RubyAttributesMapDecorator implements Map<String, Object> {
             } else if (rubyKey instanceof String) {
                 key = (String) rubyKey;
             } else {
-                throw new IllegalStateException("Did not expect key " + rubyKey + " of type " + rubyKey.getClass());
+                continue;
             }
-            value = convertRubyValue(rubyValue);
+            Object value = convertRubyValue(rubyValue);
             copy.put(key, value);
         }
         return copy;
