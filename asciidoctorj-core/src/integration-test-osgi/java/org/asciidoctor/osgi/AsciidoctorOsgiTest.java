@@ -1,6 +1,10 @@
 package org.asciidoctor.osgi;
 
+import org.asciidoctor.Asciidoctor;
+import org.asciidoctor.OptionsBuilder;
 import org.junit.Test;
+import static org.junit.Assert.assertThat;
+import static org.hamcrest.CoreMatchers.*;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 
@@ -19,7 +23,7 @@ public class AsciidoctorOsgiTest {
 
     @Deployment
     public static JavaArchive createDeployment() {
-        return ShrinkWrap.createFromZipFile(JavaArchive.class, new File("build/libs/asciidoctorj-1.6.0-SNAPSHOT.jar"));
+        return ShrinkWrap.createFromZipFile(JavaArchive.class, new File(System.getProperty("asciidoctorJarName")));
     }
 
 
@@ -28,8 +32,10 @@ public class AsciidoctorOsgiTest {
 
     @Test
     public void test() throws Exception {
-        Bundle[] bundles = ctx.getBundles();
-        System.out.println(Arrays.asList(bundles));
+        Asciidoctor asciidoctor = Asciidoctor.Factory.create();
+        String result = asciidoctor.convert("= Hello World", OptionsBuilder.options().toFile(false).headerFooter(false));
+        System.out.println(result);
+        assertThat(result, containsString("Hello World"));
     }
 
 }
