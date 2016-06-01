@@ -1,3 +1,5 @@
+package code_examples
+
 def printHello (toWho = "World") {
     println "Hello $toWho!!"
 }

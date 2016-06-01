@@ -5,6 +5,8 @@ dependencies {
   compile project(':asciidoctorj-diagram')
 
   testCompile project(':asciidoctorj-arquillian-extension')
+
+  testCompile "org.apache.pdfbox:pdfbox:$pdfboxVersion"
 }
 
 // we're creating a dist, not a jar, silly Gradle

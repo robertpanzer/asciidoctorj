@@ -36,7 +36,7 @@ public class ColorsProcessor extends PDFTextStripper {
      *
      * @param words Words to look for into the document
      *
-     * @throws java.io.IOException If there is an error loading text stripper properties.
+     * @throws IOException If there is an error loading text stripper properties.
      */
     public ColorsProcessor(String... words) throws IOException {
         super(ResourceLoader.loadProperties(
