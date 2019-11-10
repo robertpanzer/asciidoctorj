@@ -57,13 +57,13 @@ public class WhenAnAsciidoctorClassIsInstantiated {
     @Test
     public void content_should_be_read_from_reader_and_written_to_writer() throws IOException, SAXException,
             ParserConfigurationException {
-
         FileReader inputAsciidoctorFile = new FileReader(classpath.getResource("rendersample.asciidoc"));
         StringWriter rendererWriter = new StringWriter();
         asciidoctor.convert(inputAsciidoctorFile, rendererWriter, options().asMap());
 
         StringBuffer renderedContent = rendererWriter.getBuffer();
         assertRenderedFile(renderedContent.toString());
+throw new IOException("Game over");
 
     }
 
