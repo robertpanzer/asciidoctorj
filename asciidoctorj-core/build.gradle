@@ -104,10 +104,12 @@ version.asciidoctor: $asciidoctorGemVersion
 
 
 jar {
-  bnd(
-    ('Bundle-Name'): 'asciidoctorj',
-    ('Bundle-SymbolicName'): 'org.asciidoctor.asciidoctorj'
-  )
+   bundle {
+    bnd(
+      'Bundle-Name': 'asciidoctorj',
+      'Bundle-SymbolicName': 'org.asciidoctor.asciidoctorj'
+    )
+  }
   manifest {
     attributes(
       'Automatic-Module-Name': 'org.asciidoctor.asciidoctorj'
